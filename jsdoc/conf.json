@@ -1,0 +1,11 @@
+{
+  "source": {
+    "include": ["jsdoc", "src"]
+  },
+  "templates": {
+    "default": {
+      "includeDate": false
+    }
+  },
+  "plugins": ["plugins/markdown"]
+}

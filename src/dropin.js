@@ -9,6 +9,13 @@ var svgHTML = require('./html/svgs.html');
 var uuid = require('./lib/uuid');
 var VERSION = require('package.version');
 
+/**
+ * @class Dropin
+ * @param {object} options The Drop-in {@link module:braintree-web-drop-in.create create} options.
+ * @description <strong>Do not use this constructor directly. Use {@link module:braintree-web-drop-in.create|braintree-
+web-drop-in.create} instead.</strong>
+ */
+
 function Dropin(options) {
   this._componentId = uuid();
   this._options = options;
@@ -70,6 +77,11 @@ Dropin.prototype.initialize = function (callback) {
   }.bind(this));
 };
 
+/**
+ * Retrieve the active payment method, if one exists.
+ * @public
+ * @returns {Object}
+ * */
 Dropin.prototype.getActivePaymentMethod = function () {
   return this._model.getActivePaymentMethod();
 };
@@ -130,6 +142,12 @@ Dropin.prototype.getVaultedPaymentMethods = function (callback) {
   }
 };
 
+/**
+ * Cleanly remove your Drop-in integration from you page.
+ * @public
+ * @param {function} Callback executed on completion, containing an error if one occurred. No data is returned if teardown completes successfully.
+ * @returns {void}
+ * */
 Dropin.prototype.teardown = function (callback) {
   this.removeStylesheet();
 

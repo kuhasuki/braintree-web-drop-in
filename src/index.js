@@ -1,4 +1,5 @@
 'use strict';
+/** @module braintree-web-drop-in */
 
 var packageVersion = require('package.version');
 var Dropin = require('./dropin');
@@ -7,6 +8,12 @@ var deferred = require('./lib/deferred');
 var assign = require('./lib/assign').assign;
 var constants = require('./constants');
 
+/**
+ * @function create
+ * @param {object} options
+ * @param {function} callback
+ * @returns {void}
+ */
 function create(options, callback) {
   if (typeof callback !== 'function') {
     throw new Error('create must include a callback function.');
@@ -50,5 +57,9 @@ function setAnalyticsIntegration(clientInstance) {
 
 module.exports = {
   create: create,
+ /**
+  * @description The current version of the SDK, i.e. `{@pkg version}`.
+  * @type {string}
+  */
   VERSION: packageVersion
 };
