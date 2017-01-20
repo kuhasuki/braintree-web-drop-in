@@ -135,13 +135,9 @@ CardView.prototype.tokenize = function (callback) {
       return;
     }
 
-    this.model.beginLoading();
-
     this.hostedFieldsInstance.tokenize({
       vault: !this.model.isGuestCheckout
     }, function (err, payload) {
-      this.model.endLoading();
-
       if (err) {
         this.model.reportError(err);
         callback(new Error(constants.errors.NO_PAYMENT_METHOD_ERROR));
@@ -154,10 +150,12 @@ CardView.prototype.tokenize = function (callback) {
 
       this.model.addPaymentMethod(payload);
       callback(null, payload);
+      classlist.remove(this.element, 'braintree-sheet--loading');
     }.bind(this));
   } else {
     this.model.reportError({message: this.strings.hostedFieldsFieldsInvalidError});
     callback(new Error(constants.errors.NO_PAYMENT_METHOD_ERROR));
+    classlist.remove(this.element, 'braintree-sheet--loading');
   }
 };
 
@@ -264,6 +262,7 @@ CardView.prototype._onValidityChangeEvent = function (event) {
 };
 
 CardView.prototype.requestPaymentMethod = function (callback) {
+  classlist.add(this.element, 'braintree-sheet--loading');
   this.tokenize(callback);
 };
 
