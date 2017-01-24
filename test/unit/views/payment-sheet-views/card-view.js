@@ -1188,33 +1188,6 @@ describe('CardView', function () {
       expect(this.context.hostedFieldsInstance.tokenize).to.not.be.called;
     });
 
-    it('calls beginLoading when form is valid', function () {
-      this.context.model.beginLoading = this.sandbox.stub();
-
-      CardView.prototype.tokenize.call(this.context, function () {});
-
-      expect(this.context.model.beginLoading).to.have.been.calledOnce;
-    });
-
-    it('does not call beginLoading if form is invalid', function () {
-      this.context.hostedFieldsInstance.getState.returns({
-        cards: [{type: 'visa'}],
-        fields: {
-          number: {
-            isValid: true
-          },
-          expirationDate: {
-            isValid: false
-          }
-        }
-      });
-      this.context.model.beginLoading = this.sandbox.stub();
-
-      CardView.prototype.tokenize.call(this.context, function () {});
-
-      expect(this.context.model.beginLoading).to.not.be.called;
-    });
-
     it('vaults on tokenization if not using guest checkout', function () {
       this.context.model.isGuestCheckout = false;
 
@@ -1240,26 +1213,6 @@ describe('CardView', function () {
       expect(this.context.hostedFieldsInstance.clear).to.have.been.calledWith('expirationDate');
       expect(this.context.hostedFieldsInstance.clear).not.to.have.been.calledWith('cvv');
       expect(this.context.hostedFieldsInstance.clear).not.to.have.been.calledWith('postalCode');
-    });
-
-    it('calls endLoading after successful tokenization', function () {
-      var stubPayload = {};
-
-      this.sandbox.stub(this.context.model, 'endLoading');
-      this.context.hostedFieldsInstance.tokenize = this.sandbox.stub().yields(null, stubPayload);
-
-      CardView.prototype.tokenize.call(this.context, function () {});
-
-      expect(this.context.model.endLoading).to.have.been.calledOnce;
-    });
-
-    it('calls endLoading after tokenization fails', function () {
-      this.sandbox.stub(this.context.model, 'endLoading');
-      this.context.hostedFieldsInstance.tokenize.yields(new Error('foo'));
-
-      CardView.prototype.tokenize.call(this.context, function () {});
-
-      expect(this.context.model.endLoading).to.have.been.calledOnce;
     });
 
     it('adds a new payment method when tokenize is successful', function () {
