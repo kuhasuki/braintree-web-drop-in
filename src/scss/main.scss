@@ -107,6 +107,7 @@ $curve-springy: cubic-bezier(0.43, 0.48, 0.62, 1.07);
   font-size: 16px;
   color: $text-color;
   margin: 5px 5px 10px 5px;
+  transition: transform 0.2s ease;
 }
 
 .braintree-options {
@@ -277,7 +278,7 @@ $curve-springy: cubic-bezier(0.43, 0.48, 0.62, 1.07);
   }
 
   .braintree-sheet__header::after {
-    animation: loader-scale 2s infinite, loader-origin 2s steps(1) infinite;
+    animation: loader-scale 1s infinite, loader-origin 1s steps(1) infinite;
     background: green;
     bottom: -2px;
     content: '';
