@@ -112,7 +112,7 @@ CardView.prototype._initialize = function () {
 };
 
 CardView.prototype.tokenize = function (callback) {
-  var cardType, cardTypeSupported;
+  var cardType, cardTypeSupported, cleanup;
   var formValid = true;
   var state = this.hostedFieldsInstance.getState();
   var supportedCardTypes = this.client.getConfiguration().gatewayConfiguration.creditCards.supportedCardTypes;
@@ -155,9 +155,17 @@ CardView.prototype.tokenize = function (callback) {
         this.hostedFieldsInstance.clear(field);
       }.bind(this));
 
-      this.model.addPaymentMethod(payload);
-      callback(null, payload);
       classlist.remove(this.element, 'braintree-sheet--loading');
+
+      cleanup = function () {
+        this.model.addPaymentMethod(payload);
+        callback(null, payload);
+        classlist.remove(this.element, 'braintree-sheet--tokenized');
+        this.element.removeEventListener('transitionend', cleanup);
+      }.bind(this);
+
+      this.element.addEventListener('transitionend', cleanup);
+      classlist.add(this.element, 'braintree-sheet--tokenized');
     }.bind(this));
   } else {
     this.model.reportError({message: this.strings.hostedFieldsFieldsInvalidError});
