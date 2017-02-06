@@ -51,10 +51,7 @@ PaymentMethodView.prototype.setActive = function (isActive) {
     classlist.remove(this.element, 'braintree-method--inactive');
   }
 
-  // TODO transitionend instead of this?
-  setTimeout(function () {
-    classlist.toggle(this.element, 'braintree-method--active', isActive);
-  }.bind(this), 500);
+  classlist.toggle(this.element, 'braintree-method--active', isActive);
 };
 
 module.exports = PaymentMethodView;
