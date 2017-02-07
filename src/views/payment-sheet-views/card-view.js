@@ -5,6 +5,7 @@ var cardIconHTML = require('../../html/card-icons.html');
 var classlist = require('../../lib/classlist');
 var constants = require('../../constants');
 var hostedFields = require('braintree-web/hosted-fields');
+var transitionHelper = require('../../lib/transition-helper');
 
 function CardView() {
   BaseView.apply(this, arguments);
@@ -117,6 +118,7 @@ CardView.prototype.tokenize = function (callback) {
   var state = this.hostedFieldsInstance.getState();
   var supportedCardTypes = this.client.getConfiguration().gatewayConfiguration.creditCards.supportedCardTypes;
 
+  classlist.add(this.element, 'braintree-sheet--loading');
   this.model.clearError();
 
   Object.keys(state.fields).forEach(function (key) {
@@ -157,6 +159,7 @@ CardView.prototype.tokenize = function (callback) {
 
       classlist.remove(this.element, 'braintree-sheet--loading');
 
+      classlist.add(this.element, 'braintree-sheet--tokenized');
       cleanup = function () {
         this.model.addPaymentMethod(payload);
         callback(null, payload);
@@ -164,8 +167,7 @@ CardView.prototype.tokenize = function (callback) {
         this.element.removeEventListener('transitionend', cleanup);
       }.bind(this);
 
-      this.element.addEventListener('transitionend', cleanup);
-      classlist.add(this.element, 'braintree-sheet--tokenized');
+      transitionHelper.onTransitionEnd(this.element, cleanup);
     }.bind(this));
   } else {
     this.model.reportError({message: this.strings.hostedFieldsFieldsInvalidError});
@@ -277,7 +279,6 @@ CardView.prototype._onValidityChangeEvent = function (event) {
 };
 
 CardView.prototype.requestPaymentMethod = function (callback) {
-  classlist.add(this.element, 'braintree-sheet--loading');
   this.tokenize(callback);
 };
 
