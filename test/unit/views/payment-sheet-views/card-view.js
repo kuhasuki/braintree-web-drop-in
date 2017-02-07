@@ -1,13 +1,14 @@
 'use strict';
 
 var BaseView = require('../../../../src/views/base-view');
+var CardView = require('../../../../src/views/payment-sheet-views/card-view');
 var classlist = require('../../../../src/lib/classlist');
 var DropinModel = require('../../../../src/dropin-model');
 var fake = require('../../../helpers/fake');
 var hostedFields = require('braintree-web/hosted-fields');
 var mainHTML = require('../../../../src/html/main.html');
-var CardView = require('../../../../src/views/payment-sheet-views/card-view');
 var strings = require('../../../../src/translations/en');
+var transitionHelper = require('../../../../src/lib/transition-helper');
 
 describe('CardView', function () {
   beforeEach(function () {
@@ -1235,15 +1236,18 @@ describe('CardView', function () {
       expect(this.context.hostedFieldsInstance.clear).not.to.have.been.calledWith('postalCode');
     });
 
-    it('adds a new payment method when tokenize is successful', function () {
+    it('adds a new payment method when tokenize is successful', function (done) {
       var stubPayload = {};
 
       this.context.hostedFieldsInstance.tokenize = this.sandbox.stub().yields(null, stubPayload);
       this.sandbox.stub(this.model, 'addPaymentMethod');
 
-      CardView.prototype.tokenize.call(this.context, function () {});
+      this.sandbox.stub(transitionHelper, 'onTransitionEnd').yields();
 
-      expect(this.model.addPaymentMethod).to.have.been.calledWith(stubPayload);
+      CardView.prototype.tokenize.call(this.context, function () {
+        expect(this.model.addPaymentMethod).to.have.been.calledWith(stubPayload);
+        done();
+      }.bind(this));
     });
 
     it('does not update the active payment method when tokenize fails', function () {
