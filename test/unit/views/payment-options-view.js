@@ -8,6 +8,7 @@ var DropinModel = require('../../../src/dropin-model');
 var strings = require('../../../src/translations/en');
 var fake = require('../../helpers/fake');
 var analytics = require('../../../src/lib/analytics');
+var transitionHelper = require('../../../src/lib/transition-helper');
 
 describe('PaymentOptionsView', function () {
   describe('Constructor', function () {
@@ -73,6 +74,40 @@ describe('PaymentOptionsView', function () {
       expect(iconContainer.classList.contains('braintree-option__logo@CLASSNAME')).to.be.false;
     });
 
+    it('sets braintree-option--active when clicked', function () {
+      var mainViewStub = {setPrimaryView: this.sandbox.stub()};
+      var paymentOptionsView = new PaymentOptionsView({
+        client: this.client,
+        element: this.element,
+        mainView: mainViewStub,
+        model: modelThatSupports(['card']),
+        strings: strings
+      });
+      var option = paymentOptionsView.container.querySelector('.braintree-option');
+
+      option.click();
+
+      expect(option.classList.contains('braintree-option--active')).to.be.true;
+    });
+
+    it('removes braintree-option--active class when finished transition', function () {
+      var mainViewStub = {setPrimaryView: this.sandbox.stub()};
+      var paymentOptionsView = new PaymentOptionsView({
+        client: this.client,
+        element: this.element,
+        mainView: mainViewStub,
+        model: modelThatSupports(['card']),
+        strings: strings
+      });
+      var option = paymentOptionsView.container.querySelector('.braintree-option');
+
+      this.sandbox.stub(transitionHelper, 'onTransitionEnd').yields();
+
+      option.click();
+
+      expect(option.classList.contains('braintree-option--active')).to.be.false;
+    });
+
     it('sets the primary view to the payment option when clicked', function () {
       var mainViewStub = {setPrimaryView: this.sandbox.stub()};
       var paymentOptionsView = new PaymentOptionsView({
@@ -83,6 +118,8 @@ describe('PaymentOptionsView', function () {
         strings: strings
       });
       var option = paymentOptionsView.container.querySelector('.braintree-option');
+
+      this.sandbox.stub(transitionHelper, 'onTransitionEnd').yields();
 
       option.click();
 
