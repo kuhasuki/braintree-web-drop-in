@@ -122,6 +122,7 @@ describe('PaymentMethodsView', function () {
 
     it('changes the payment method view when the active payment method changes', function () {
       var model, paymentMethodsViews;
+      var clock = sinon.useFakeTimers();
       var fakePaymentMethod = {baz: 'qux'};
       var modelOptions = fake.modelOptions();
 
@@ -144,7 +145,9 @@ describe('PaymentMethodsView', function () {
       model.changeActivePaymentMethod(fakePaymentMethod);
 
       expect(paymentMethodsViews.activeMethodView.paymentMethod).to.equal(fakePaymentMethod);
+      clock.tick(1001);
       expect(paymentMethodsViews.activeMethodView.element.className).to.contain('braintree-method--active');
+      clock.restore();
     });
   });
 
