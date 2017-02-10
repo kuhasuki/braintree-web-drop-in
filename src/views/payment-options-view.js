@@ -2,10 +2,7 @@
 
 var analytics = require('../lib/analytics');
 var BaseView = require('./base-view');
-var classlist = require('../lib/classlist');
-var paymentMethodOptionHTML = require('../html/payment-option.html');
-var paymentOptionIDs = require('../constants').paymentOptionIDs;
-var transitionHelper = require('../lib/transition-helper');
+var PaymentOptionView = require('./payment-option-view');
 
 function PaymentOptionsView() {
   BaseView.apply(this, arguments);
@@ -18,7 +15,10 @@ PaymentOptionsView.prototype.constructor = PaymentOptionsView;
 PaymentOptionsView.ID = PaymentOptionsView.prototype.ID = 'options';
 
 PaymentOptionsView.prototype._initialize = function () {
+  this.views = [];
   this.container = this.getElementById('payment-options-container');
+
+  this.model.on('changeActivePaymentOption', this._changeActivePaymentOption.bind(this));
 
   this.model.supportedPaymentOptions.forEach(function (paymentOptionID) {
     this._addPaymentOption(paymentOptionID);
@@ -26,37 +26,34 @@ PaymentOptionsView.prototype._initialize = function () {
 };
 
 PaymentOptionsView.prototype._addPaymentOption = function (paymentOptionID) {
-  var self = this;
-  var div = document.createElement('div');
-  var html = paymentMethodOptionHTML;
+  var paymentOptionView = new PaymentOptionView({
+    model: this.model,
+    paymentOptionID: paymentOptionID,
+    strings: this.strings
+  });
 
-  div.className = 'braintree-option';
+  this.views.push(paymentOptionView);
+  this.container.appendChild(paymentOptionView.element);
+};
 
-  switch (paymentOptionID) {
-    case paymentOptionIDs.card:
-      html = html.replace(/@ICON/g, 'iconCardFront');
-      html = html.replace(/@OPTION_TITLE/g, self.strings.Card);
-      html = html.replace(/@CLASSNAME/g, 'braintree-icon--bordered');
-      break;
-    case paymentOptionIDs.paypal:
-      html = html.replace(/@ICON/g, 'logoPayPal');
-      html = html.replace(/@OPTION_TITLE/g, self.strings.PayPal);
-      html = html.replace(/@CLASSNAME/g, '');
-      break;
-    default:
-      break;
+PaymentOptionsView.prototype._changeActivePaymentOption = function (paymentOptionID) {
+  var i, optionView;
+
+  for (i = 0; i < this.views.length; i++) {
+    optionView = this.views[i];
+
+    if (this.views[i].paymentOptionID === paymentOptionID) {
+      this.activeOptionView = optionView;
+    } else {
+      optionView.setActive(false);
+    }
   }
 
-  div.innerHTML = html;
-  div.addEventListener('click', function () {
-    classlist.add(div, 'braintree-option--active');
-    transitionHelper.onTransitionEnd(div, function () {
-      self.mainView.setPrimaryView(paymentOptionID);
-      classlist.remove(div, 'braintree-option--active');
-    });
-    analytics.sendEvent(self.client, 'selected.' + paymentOptionIDs[paymentOptionID]);
-  });
-  self.container.appendChild(div);
+  this.activeOptionView.setActive(true, function () {
+    this.mainView.setPrimaryView(paymentOptionID);
+  }.bind(this));
+
+  analytics.sendEvent(this.client, 'selected.' + paymentOptionID);
 };
 
 module.exports = PaymentOptionsView;
