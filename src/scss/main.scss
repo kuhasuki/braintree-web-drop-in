@@ -108,7 +108,7 @@ $border-transition: opacity 300ms, box-shadow 300ms, width 200ms $curve-easeOutB
 .braintree-heading {
   font-size: 16px;
   color: $text-color;
-  margin: 5px 5px 10px 5px;
+  margin: 5px 5px 10px 7px;
   transition: transform 0.2s ease;
 }
 
@@ -132,11 +132,18 @@ $border-transition: opacity 300ms, box-shadow 300ms, width 200ms $curve-easeOutB
   border-style: solid;
   border-width: 0 1px 1px 1px;
   cursor: pointer;
-  display: flex;
   padding: 12px 10px;
-  align-items: center;
   // TODO transition on a CSS property towards payment sheet view
-  transition: background-color 0.2s;
+  height: 53px;
+  opacity: 1;
+  transition: 
+    border-radius 300ms, 
+    border-width 300ms, 
+    opacity 300ms, 
+    background-color 300ms, 
+    height 300ms, 
+    transform 300ms, 
+    width 300ms;
 
   &:first-child {
     border-radius: 4px 4px 0 0;
@@ -151,18 +158,45 @@ $border-transition: opacity 300ms, box-shadow 300ms, width 200ms $curve-easeOutB
     display: flex;
     align-items: center;
     text-align: center;
+    transition: transform 300ms;
   }
 
   .braintree-option__label {
     color: $text-color;
     font-size: 16px;
     margin-left: 20px;
+    transition: opacity 200ms, transform 300ms;
+  }
+
+  .braintree-option__container {
+    display: flex;
+    align-items: center;
   }
 }
 
-.braintree-option--active {
+
+.braintree-option.braintree-option--selected {
   // TODO better transition towards the payment sheet view 
-  background-color: tomato; 
+  background-color: white;
+  border-radius: 4px;
+  border-top-width: 1px;
+  height: 200px;
+  transform: translateY(-28px);
+  width: 100%;
+
+  .braintree-option__logo {
+    transform: translateX(3px);  
+  }
+
+  .braintree-option__label {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+
+.braintree-option--unselected {
+  // TODO better transition towards the payment sheet view 
+  opacity: 0;
 }
 
 .braintree-sheet {
