@@ -38,6 +38,10 @@ DropinModel.prototype.changeActivePaymentView = function (paymentViewID) {
   this._emit('changeActivePaymentView', paymentViewID);
 };
 
+DropinModel.prototype.changeActivePaymentOption = function (optionID) {
+  this._emit('changeActivePaymentOption', optionID);
+};
+
 DropinModel.prototype.getPaymentMethods = function () {
   return this._paymentMethods;
 };

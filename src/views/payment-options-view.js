@@ -2,8 +2,7 @@
 
 var analytics = require('../lib/analytics');
 var BaseView = require('./base-view');
-var paymentMethodOptionHTML = require('../html/payment-option.html');
-var paymentOptionIDs = require('../constants').paymentOptionIDs;
+var PaymentOptionView = require('./payment-option-view');
 
 function PaymentOptionsView() {
   BaseView.apply(this, arguments);
@@ -16,7 +15,10 @@ PaymentOptionsView.prototype.constructor = PaymentOptionsView;
 PaymentOptionsView.ID = PaymentOptionsView.prototype.ID = 'options';
 
 PaymentOptionsView.prototype._initialize = function () {
+  this.views = [];
   this.container = this.getElementById('payment-options-container');
+
+  this.model.on('changeActivePaymentOption', this._changeActivePaymentOption.bind(this));
 
   this.model.supportedPaymentOptions.forEach(function (paymentOptionID) {
     this._addPaymentOption(paymentOptionID);
@@ -24,32 +26,34 @@ PaymentOptionsView.prototype._initialize = function () {
 };
 
 PaymentOptionsView.prototype._addPaymentOption = function (paymentOptionID) {
-  var div = document.createElement('div');
-  var html = paymentMethodOptionHTML;
+  var paymentOptionView = new PaymentOptionView({
+    model: this.model,
+    paymentOptionID: paymentOptionID,
+    strings: this.strings
+  });
 
-  div.className = 'braintree-option';
+  this.views.push(paymentOptionView);
+  this.container.appendChild(paymentOptionView.element);
+};
 
-  switch (paymentOptionID) {
-    case paymentOptionIDs.card:
-      html = html.replace(/@ICON/g, 'iconCardFront');
-      html = html.replace(/@OPTION_TITLE/g, this.strings.Card);
-      html = html.replace(/@CLASSNAME/g, 'braintree-icon--bordered');
-      break;
-    case paymentOptionIDs.paypal:
-      html = html.replace(/@ICON/g, 'logoPayPal');
-      html = html.replace(/@OPTION_TITLE/g, this.strings.PayPal);
-      html = html.replace(/@CLASSNAME/g, '');
-      break;
-    default:
-      break;
+PaymentOptionsView.prototype._changeActivePaymentOption = function (paymentOptionID) {
+  var i, optionView;
+
+  for (i = 0; i < this.views.length; i++) {
+    optionView = this.views[i];
+
+    if (this.views[i].paymentOptionID === paymentOptionID) {
+      this.activeOptionView = optionView;
+    } else {
+      optionView.setActive(false);
+    }
   }
 
-  div.innerHTML = html;
-  div.addEventListener('click', function () {
+  this.activeOptionView.setActive(true, function () {
     this.mainView.setPrimaryView(paymentOptionID);
-    analytics.sendEvent(this.client, 'selected.' + paymentOptionIDs[paymentOptionID]);
   }.bind(this));
-  this.container.appendChild(div);
+
+  analytics.sendEvent(this.client, 'selected.' + paymentOptionID);
 };
 
 module.exports = PaymentOptionsView;
