@@ -1,15 +1,27 @@
 'use strict';
 
+var analytics = require('../../../src/lib/analytics');
 var BaseView = require('../../../src/views/base-view');
 var CardView = require('../../../src/views/payment-sheet-views/card-view');
+var DropinModel = require('../../../src/dropin-model');
+var fake = require('../../helpers/fake');
 var mainHTML = require('../../../src/html/main.html');
 var PaymentOptionsView = require('../../../src/views/payment-options-view');
-var DropinModel = require('../../../src/dropin-model');
 var strings = require('../../../src/translations/en');
-var fake = require('../../helpers/fake');
-var analytics = require('../../../src/lib/analytics');
+var transitionHelper = require('../../../src/lib/transition-helper');
 
 describe('PaymentOptionsView', function () {
+  beforeEach(function () {
+    this.wrapper = document.createElement('div');
+    this.wrapper.innerHTML = mainHTML;
+    this.element = this.wrapper.querySelector('[data-braintree-id="' + PaymentOptionsView.ID + '"]');
+    this.client = {
+      getConfiguration: fake.configuration,
+      request: function () {},
+      _request: function () {}
+    };
+  });
+
   describe('Constructor', function () {
     beforeEach(function () {
       this.sandbox.stub(PaymentOptionsView.prototype, '_initialize');
@@ -27,18 +39,6 @@ describe('PaymentOptionsView', function () {
   });
 
   describe('_initialize', function () {
-    beforeEach(function () {
-      this.wrapper = document.createElement('div');
-      this.wrapper.innerHTML = mainHTML;
-
-      this.element = this.wrapper.querySelector('[data-braintree-id="' + PaymentOptionsView.ID + '"]');
-      this.client = {
-        getConfiguration: fake.configuration,
-        request: function () {},
-        _request: function () {}
-      };
-    });
-
     it('adds a Card option', function () {
       var paymentOptionsView = new PaymentOptionsView({
         client: this.client,
@@ -72,7 +72,9 @@ describe('PaymentOptionsView', function () {
       expect(icon.href.baseVal).to.equal('#logoPayPal');
       expect(iconContainer.classList.contains('braintree-option__logo@CLASSNAME')).to.be.false;
     });
+  });
 
+  describe('_changeActivePaymentOption', function () {
     it('sets the primary view to the payment option when clicked', function () {
       var mainViewStub = {setPrimaryView: this.sandbox.stub()};
       var paymentOptionsView = new PaymentOptionsView({
@@ -84,23 +86,69 @@ describe('PaymentOptionsView', function () {
       });
       var option = paymentOptionsView.container.querySelector('.braintree-option');
 
+      this.sandbox.stub(transitionHelper, 'onTransitionEnd').yields();
+
       option.click();
 
       expect(mainViewStub.setPrimaryView).to.have.been.calledWith(CardView.ID);
     });
   });
 
-  describe('sends analytics events', function () {
-    beforeEach(function () {
-      var wrapper = document.createElement('div');
-
-      wrapper.innerHTML = mainHTML;
-
-      this.element = wrapper.querySelector('[data-braintree-id="' + PaymentOptionsView.ID + '"]');
-
-      this.viewConfiguration = {
+  describe('_changeActivePaymentOption', function () {
+    it('adds the braintree-options--option-selected class when an option is selected', function (done) {
+      var mainViewStub = {setPrimaryView: this.sandbox.stub()};
+      var paymentOptionsView = new PaymentOptionsView({
+        client: this.client,
         element: this.element,
-        mainView: {setPrimaryView: function () {}},
+        mainView: mainViewStub,
+        model: modelThatSupports(['card']),
+        strings: strings
+      });
+      var option = paymentOptionsView.container.querySelector('.braintree-option');
+      var options = paymentOptionsView.element;
+
+      this.sandbox.stub(transitionHelper, 'onTransitionEnd', function () {
+        expect(options.classList.contains('braintree-options--option-selected')).to.be.true;
+
+        done();
+      });
+
+      option.click();
+    });
+
+    it('removes the braintree-options--option-selected class after transistionend', function () {
+      var clock = sinon.useFakeTimers();
+      var mainViewStub = {
+        setPrimaryView: this.sandbox.stub()
+      };
+      var paymentOptionsView = new PaymentOptionsView({
+        client: this.client,
+        element: this.element,
+        mainView: mainViewStub,
+        model: modelThatSupports(['card']),
+        strings: strings
+      });
+      var option = paymentOptionsView.container.querySelector('.braintree-option');
+      var options = paymentOptionsView.element;
+
+      this.sandbox.stub(transitionHelper, 'onTransitionEnd').yields();
+
+      option.click();
+
+      expect(options.classList.contains('braintree-options--option-selected')).to.be.false;
+
+      clock.restore();
+    });
+  });
+
+  describe('sends analytics events', function () {
+    var viewConfiguration;
+
+    beforeEach(function () {
+      viewConfiguration = {
+        client: this.client,
+        element: this.element,
+        mainView: {setPrimaryView: this.sandbox.stub()},
         strings: strings
       };
     });
@@ -108,7 +156,6 @@ describe('PaymentOptionsView', function () {
     it('when the Card option is selected', function () {
       var option, paymentOptionsView;
       var model = modelThatSupports(['card']);
-      var viewConfiguration = this.viewConfiguration;
 
       this.sandbox.stub(analytics, 'sendEvent');
 
@@ -124,7 +171,6 @@ describe('PaymentOptionsView', function () {
     it('when the PayPal option is selected', function () {
       var option, paymentOptionsView;
       var model = modelThatSupports(['paypal']);
-      var viewConfiguration = this.viewConfiguration;
 
       this.sandbox.stub(analytics, 'sendEvent');
 

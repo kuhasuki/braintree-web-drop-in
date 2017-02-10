@@ -2,7 +2,9 @@
 
 var analytics = require('../lib/analytics');
 var BaseView = require('./base-view');
+var classlist = require('../lib/classlist');
 var PaymentOptionView = require('./payment-option-view');
+var transitionHelper = require('../lib/transition-helper');
 
 function PaymentOptionsView() {
   BaseView.apply(this, arguments);
@@ -38,22 +40,28 @@ PaymentOptionsView.prototype._addPaymentOption = function (paymentOptionID) {
 
 PaymentOptionsView.prototype._changeActivePaymentOption = function (paymentOptionID) {
   var i, optionView;
+  var self = this;
 
-  for (i = 0; i < this.views.length; i++) {
-    optionView = this.views[i];
+  for (i = 0; i < self.views.length; i++) {
+    optionView = self.views[i];
 
-    if (this.views[i].paymentOptionID === paymentOptionID) {
-      this.activeOptionView = optionView;
+    if (self.views[i].paymentOptionID === paymentOptionID) {
+      self.activeOptionView = optionView;
     } else {
       optionView.setActive(false);
     }
   }
 
-  this.activeOptionView.setActive(true, function () {
-    this.mainView.setPrimaryView(paymentOptionID);
-  }.bind(this));
+  self.activeOptionView.setActive(true, function () {
+    classlist.add(self.element, 'braintree-options--option-selected');
 
-  analytics.sendEvent(this.client, 'selected.' + paymentOptionID);
+    transitionHelper.onTransitionEnd(self.element, function () {
+      self.mainView.setPrimaryView(paymentOptionID);
+      classlist.remove(self.element, 'braintree-options--option-selected');
+    });
+  });
+
+  analytics.sendEvent(self.client, 'selected.' + paymentOptionID);
 };
 
 module.exports = PaymentOptionsView;

@@ -111,6 +111,12 @@ $curve-springy: cubic-bezier(0.43, 0.48, 0.62, 1.07);
 
 .braintree-options {
   display: none;
+  // TODO add relevant transitions
+  transition: background 300ms;
+
+  .braintree-options--option-selected {
+    background: tomato;
+  }
 }
 
 .braintree-options-list {
