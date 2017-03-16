@@ -20,6 +20,7 @@ function MainView() {
 MainView.prototype = Object.create(BaseView.prototype);
 MainView.prototype.constructor = MainView;
 
+// TODO: why is this called twice?
 MainView.prototype._initialize = function () {
   var hasMultiplePaymentOptions = this.model.supportedPaymentOptions.length > 1;
   var paymentMethodsViews, paymentOptionsView;
@@ -49,6 +50,8 @@ MainView.prototype._initialize = function () {
     if (this.model.supportedPaymentOptions.indexOf(sheetViewKey) !== -1) {
       PaymentSheetView = sheetViews[sheetViewKey];
 
+      debugger;
+
       paymentSheetView = new PaymentSheetView({
         element: this.getElementById(PaymentSheetView.ID),
         mainView: this,
@@ -65,7 +68,9 @@ MainView.prototype._initialize = function () {
   }.bind(this), []);
 
   paymentMethodsViews = new PaymentMethodsView({
-    element: this.getElementById(PaymentMethodsView.ID),
+    // Can't do this anymore because the method-label is outside our "methods" div
+    // element: this.getElementById(PaymentMethodsView.ID),
+    element: this.element,
     model: this.model,
     strings: this.strings
   });

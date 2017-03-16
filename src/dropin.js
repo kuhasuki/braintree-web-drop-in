@@ -78,6 +78,7 @@ Dropin.prototype._initialize = function (callback) {
   container.appendChild(this._dropinWrapper);
 
   setTimeout(function () {
+    console.log('getVaultedPaymentMethods');
     this._getVaultedPaymentMethods(function (paymentMethods) {
       try {
         this._model = new DropinModel({
@@ -105,6 +106,7 @@ Dropin.prototype._initialize = function (callback) {
         }
       }.bind(this));
 
+      console.log('creating new MainView');
       this._mainView = new MainView({
         client: this._client,
         element: this._dropinWrapper,
@@ -185,11 +187,14 @@ Dropin.prototype._getVaultedPaymentMethods = function (callback) {
       var paymentMethods;
 
       if (err) {
+        // a bug in client.request causes this callback to be called twice if it throws
+        console.error('Failed to get vaulted payment methods:', err);
         paymentMethods = [];
       } else {
         paymentMethods = paymentMethodsPayload.paymentMethods.map(formatPaymentMethodPayload);
       }
 
+      console.log('calling callback');
       callback(paymentMethods);
     });
   }
