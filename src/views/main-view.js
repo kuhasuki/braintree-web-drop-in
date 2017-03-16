@@ -144,7 +144,7 @@ MainView.prototype.setPrimaryView = function (id) {
 
     // Move options below the upper-container
     this.getElementById('lower-container').appendChild(this.getElementById('choose-a-way-to-pay'));
-    this.getElementById('lower-container').appendChild(this.getElementById('other-ways-to-pay'));
+    // this.getElementById('lower-container').appendChild(this.getElementById('other-ways-to-pay'));
     this.getElementById('lower-container').appendChild(this.getElementById('options'));
 
   } else if (id === PaymentOptionsView.ID) {

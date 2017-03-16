@@ -2,10 +2,8 @@
   <div class="braintree-methods">
     <div data-braintree-id="methods-label" class="braintree-heading">{{payingWith}}</div>
   </div>
-
-  <!-- todo: move these below if there are payment methods -->
   <div data-braintree-id="choose-a-way-to-pay" class="braintree-heading">{{chooseAWayToPay}}</div>
-  <div data-braintree-id="other-ways-to-pay" class="braintree-heading">{{otherWaysToPay}}</div>
+
 
   <div data-braintree-id="upper-container" class="braintree-upper-container">
 
@@ -145,7 +143,10 @@
   </div>
 
   <!-- todo: move braintree-options here when there are payment methods -->
-  <div data-braintree-id="lower-container" class="braintree-options"></div>
+
+  <div data-braintree-id="lower-container" class="braintree-options">
+    <div data-braintree-id="other-ways-to-pay" class="braintree-heading">{{otherWaysToPay}}</div>
+  </div>
 
   <div data-braintree-id="toggle" class="braintree-toggle braintree-hidden">
     <span>{{chooseAnotherWayToPay}}</span>
