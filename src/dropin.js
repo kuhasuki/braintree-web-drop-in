@@ -22,7 +22,13 @@ function Dropin(options) {
   this._dropinWrapper = document.createElement('div');
   this._dropinWrapper.id = 'braintree--dropin__' + this._componentID;
   this._dropinWrapper.setAttribute('data-braintree-id', 'wrapper');
+
+  // Hide dropinWrapper until CSS has loaded.
+  // Prevents flicker of unstyled content.
   this._dropinWrapper.style.display = 'none';
+
+  this._dropinWrapper.className = 'braintree-loading';
+
   this._merchantConfiguration = options.merchantConfiguration;
 
   EventEmitter.call(this);

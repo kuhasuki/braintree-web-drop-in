@@ -11,6 +11,7 @@ $curve-springy: cubic-bezier(0.43, 0.48, 0.62, 1.07);
 $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
 [data-braintree-id="wrapper"] {
+  // this overrides the display = 'none' in dropin.js
   display: block !important;
 }
 
@@ -163,9 +164,10 @@ $initial-container-height: 140px;
     width: 98.28%;
     height: 99%;
     border: 1px solid $border-color;
-    transition: border-width 3000ms linear 300ms;
+    transition: border-width 1000ms linear 600ms;
     border-radius: 4px;
-    z-index: -2;
+    z-index: -3;
+    background-color: $background-color;
   }
 }
 
@@ -173,7 +175,7 @@ $initial-container-height: 140px;
   // box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 6px $border-color;
   // padding: 0;
   &:after {
-    border-width: 0px;
+    border-width: 0px; // Note: Doesn't look like anything in most viewport sizes
   }
 }
 
@@ -181,6 +183,7 @@ $initial-container-height: 140px;
 .braintree-options {
   // display: none;
   max-height: 0px;
+  overflow: hidden;
 }
 
 .braintree-options-list {
@@ -294,7 +297,7 @@ $initial-container-height: 140px;
   }
 }
 
-.braintree-methods .braintree-sheet--active {
+.braintree-show-methods .braintree-sheet--active {
   &.braintree-sheet--has-error .braintree-sheet {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
@@ -610,8 +613,6 @@ $initial-container-height: 140px;
   border-radius: 5px;
   border-color: rgba(0,0,0,0);
   width: 100%;
-  margin-top: -1px;
-  margin-bottom: -1px;
   opacity: 1;
   z-index: 1;
 
@@ -671,23 +672,29 @@ $initial-container-height: 140px;
 .braintree-methods-foo {
   // display: none !important;
   max-height: 0px;
-  transition: max-height 3000ms,
-              opacity 300ms linear 1s;
   opacity: 0;
   // overflow: hidden;
 }
 
-.braintree-methods-bar {
+.braintree-show-methods .braintree-methods-bar {
   max-height: 1000px;
   opacity: 1;
+  transition: max-height 3000ms,
+              opacity 300ms linear 1s;
 }
 
-// todo: use a different method of showing things
-.braintree-methods .braintree-methods,
-.braintree-options .braintree-options,
-.braintree-paypal .braintree-paypal,
-.braintree-card .braintree-card {
+// todo: rename one of these
+.braintree-show-methods .braintree-methods,
+.braintree-show-options .braintree-options,
+.braintree-show-paypal .braintree-paypal,
+.braintree-show-card .braintree-card {
   display: block;
+}
+
+// braintree-options is hidden with a max-height: 0px
+// Show it by setting max-height: none
+.braintree-show-options .braintree-options {
+  max-height: none;
 }
 
 [data-braintree-id="other-ways-to-pay"] {
@@ -698,14 +705,16 @@ $initial-container-height: 140px;
   display: block;
 }
 
-.braintree-methods [data-braintree-id="other-ways-to-pay"],
-.braintree-paypal [data-braintree-id="other-ways-to-pay"],
-.braintree-card [data-braintree-id="other-ways-to-pay"] {
+.braintree-show-methods [data-braintree-id="other-ways-to-pay"],
+.braintree-show-paypal [data-braintree-id="other-ways-to-pay"],
+.braintree-show-card [data-braintree-id="other-ways-to-pay"] {
   display: block;
 }
 
-.braintree-methods [data-braintree-id="choose-a-way-to-pay"],
-.braintree-paypal [data-braintree-id="choose-a-way-to-pay"],
-.braintree-card [data-braintree-id="choose-a-way-to-pay"] {
+// .braintree-loading [data-braintree-id="methods-label"],
+.braintree-loading [data-braintree-id="choose-a-way-to-pay"],
+.braintree-show-methods [data-braintree-id="choose-a-way-to-pay"],
+.braintree-show-paypal [data-braintree-id="choose-a-way-to-pay"],
+.braintree-show-card [data-braintree-id="choose-a-way-to-pay"] {
   display: none;
 }

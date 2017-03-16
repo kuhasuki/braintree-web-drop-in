@@ -123,7 +123,7 @@ MainView.prototype.setPrimaryView = function (id) {
     this.primaryView.closeFrame();
   }
 
-  this.element.className = prefixClass(id);
+  this.element.className = prefixShowClass(id);
   this.primaryView = this.getView(id);
   this.model.changeActivePaymentView(id);
 
@@ -208,7 +208,7 @@ MainView.prototype.toggleAdditionalOptions = function () {
   if (!hasMultiplePaymentOptions) {
     sheetViewID = this.paymentSheetViewIDs[0];
 
-    classlist.add(this.element, prefixClass(sheetViewID));
+    classlist.add(this.element, prefixShowClass(sheetViewID));
     this.model.changeActivePaymentView(sheetViewID);
   } else if (isPaymentSheetView) {
     if (this.model.getPaymentMethods().length === 0) {
@@ -216,10 +216,10 @@ MainView.prototype.toggleAdditionalOptions = function () {
     } else {
       this.setPrimaryView(PaymentMethodsView.ID);
       this.hideToggle();
-      classlist.add(this.element, prefixClass(PaymentOptionsView.ID));
+      classlist.add(this.element, prefixShowClass(PaymentOptionsView.ID));
     }
   } else {
-    classlist.add(this.element, prefixClass(PaymentOptionsView.ID));
+    classlist.add(this.element, prefixShowClass(PaymentOptionsView.ID));
   }
 };
 
@@ -278,8 +278,8 @@ function snakeCaseToCamelCase(s) {
   });
 }
 
-function prefixClass(classname) {
-  return 'braintree-' + classname;
+function prefixShowClass(classname) {
+  return 'braintree-show-' + classname;
 }
 
 module.exports = MainView;
