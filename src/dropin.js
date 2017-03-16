@@ -71,40 +71,42 @@ Dropin.prototype._initialize = function (callback) {
   this._dropinWrapper.innerHTML = svgHTML + localizedHTML;
   container.appendChild(this._dropinWrapper);
 
-  this._getVaultedPaymentMethods(function (paymentMethods) {
-    try {
-      this._model = new DropinModel({
-        client: this._client,
-        componentID: this._componentID,
-        merchantConfiguration: this._merchantConfiguration,
-        paymentMethods: paymentMethods
-      });
-    } catch (modelError) {
-      dropinInstance.teardown(function () {
-        callback(modelError);
-      });
-      return;
-    }
-
-    this._model.on('asyncDependenciesReady', function () {
-      if (this._model.dependencySuccessCount >= 1) {
-        analytics.sendEvent(this._client, 'appeared');
-        this._disableErroredPaymentMethods();
-        callback(null, dropinInstance);
-      } else {
-        analytics.sendEvent(this._client, 'load-error');
-        this._dropinWrapper.innerHTML = '';
-        callback(new Error('All payment options failed to load.'));
+  setTimeout(function () {
+    this._getVaultedPaymentMethods(function (paymentMethods) {
+      try {
+        this._model = new DropinModel({
+          client: this._client,
+          componentID: this._componentID,
+          merchantConfiguration: this._merchantConfiguration,
+          paymentMethods: paymentMethods
+        });
+      } catch (modelError) {
+        dropinInstance.teardown(function () {
+          callback(modelError);
+        });
+        return;
       }
-    }.bind(this));
 
-    this._mainView = new MainView({
-      client: this._client,
-      element: this._dropinWrapper,
-      model: this._model,
-      strings: strings
-    });
-  }.bind(this));
+      this._model.on('asyncDependenciesReady', function () {
+        if (this._model.dependencySuccessCount >= 1) {
+          analytics.sendEvent(this._client, 'appeared');
+          this._disableErroredPaymentMethods();
+          callback(null, dropinInstance);
+        } else {
+          analytics.sendEvent(this._client, 'load-error');
+          this._dropinWrapper.innerHTML = '';
+          callback(new Error('All payment options failed to load.'));
+        }
+      }.bind(this));
+
+      this._mainView = new MainView({
+        client: this._client,
+        element: this._dropinWrapper,
+        model: this._model,
+        strings: strings
+      });
+    }.bind(this));
+  }.bind(this), 1000);
 };
 
 Dropin.prototype._disableErroredPaymentMethods = function () {
@@ -147,7 +149,8 @@ Dropin.prototype._injectStylesheet = function () {
   if (document.getElementById(constants.STYLESHEET_ID)) { return; }
 
   assetsUrl = this._client.getConfiguration().gatewayConfiguration.assetsUrl;
-  stylesheetUrl = assetsUrl + '/web/dropin/' + VERSION + '/css/dropin@DOT_MIN.css';
+  // stylesheetUrl = assetsUrl + '/web/dropin/' + VERSION + '/css/dropin@DOT_MIN.css';
+  stylesheetUrl = '/web/dropin/dev/css/dropin.css';
   stylesheet = document.createElement('link');
   head = document.head;
 

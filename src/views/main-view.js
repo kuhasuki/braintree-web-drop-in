@@ -130,11 +130,23 @@ MainView.prototype.setPrimaryView = function (id) {
   if (this.paymentSheetViewIDs.indexOf(id) !== -1) {
     if (this.model.getPaymentMethods().length > 0 || this.getView(PaymentOptionsView.ID)) {
       this.showToggle();
+
+      // ???
+
+      // Move options below the upper-container
+      this.getElementById('lower-container').appendChild(this.getElementById('options'));
+
     } else {
       this.hideToggle();
     }
   } else if (id === PaymentMethodsView.ID) {
     this.showToggle();
+
+    // Move options below the upper-container
+    this.getElementById('lower-container').appendChild(this.getElementById('choose-a-way-to-pay'));
+    this.getElementById('lower-container').appendChild(this.getElementById('other-ways-to-pay'));
+    this.getElementById('lower-container').appendChild(this.getElementById('options'));
+
   } else if (id === PaymentOptionsView.ID) {
     this.hideToggle();
   }
@@ -165,14 +177,25 @@ MainView.prototype.requestPaymentMethod = function (callback) {
 };
 
 MainView.prototype.hideLoadingIndicator = function () {
-  setTimeout(function () {
-    classlist.add(this.loadingIndicator, 'braintree-loader__indicator--inactive');
-  }.bind(this), 200);
+  // classlist.add(this.getElementById('methods'), 'braintree-methods--loading');
 
   setTimeout(function () {
+    classlist.add(this.loadingIndicator, 'braintree-loader__indicator--inactive');
     classlist.add(this.loadingContainer, 'braintree-loader__container--inactive');
-    classlist.remove(this.dropinContainer, 'braintree-hidden');
-  }.bind(this), 1000);
+
+    setTimeout(function () {
+      classlist.add(this.getElementById('methods'), 'braintree-methods-bar');
+
+      setTimeout(function () {
+        classlist.add(this.getElementById('upper-container'), 'braintree-upper-container--loaded');
+      }.bind(this), 300);
+    }.bind(this), 300);
+  }.bind(this), 200);
+
+  // setTimeout(function () {
+  //   classlist.add(this.loadingContainer, 'braintree-loader__container--inactive');
+  //   classlist.remove(this.dropinContainer, 'braintree-hidden');
+  // }.bind(this), 200);
 };
 
 MainView.prototype.toggleAdditionalOptions = function () {

@@ -14,6 +14,7 @@ $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: block !important;
 }
 
+
 .braintree-dropin * {
   box-sizing: border-box;
 }
@@ -43,22 +44,41 @@ $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   fill: $black-40;
 }
 
-.braintree-loader__container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  opacity: 1;
-  z-index: 2;
-  transition: opacity 500ms ease;
-}
+$loader-scale-duration: 300ms;
+$initial-container-height: 140px;
 
-.braintree-loader__container--inactive {
-  display: none;
-  height: 0;
-  opacity: 0;
-  z-index: -2;
+.braintree-loader__container {
+  position: absolute;
+  // display: flex;                 
+  // align-items: center;           
+  // justify-content: center;       
+  width: 100%;                   
+  height: $initial-container-height;                  
+  opacity: 1;                    
+  z-index: 2;                    
+  transition: opacity 500ms ease;
+  // max-height: 140px;
+
+  &.braintree-loader__container--inactive {
+
+    //display: none;
+
+    // margin: 0;
+    // padding: 0;
+    // // height: 0;
+
+    // max-height: 0px;
+    // transition: max-height 0s linear $loader-scale-duration;
+
+    // opacity: 0;
+    // // transition: 
+    // //   opacity 0.3s linear, 
+    // //   margin 0s linear 0.3s,
+    // //   padding 0s linear 0.3s,
+    // //   height 0s linear 0.3s,
+    // //   max-height 0s linear 0.6s;
+    z-index: -2;
+  }
 }
 
 .braintree-loader__indicator {
@@ -66,9 +86,14 @@ $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border-radius: 50%;
   height: 72px;
   width: 72px;
-  position: relative;
-  transition: transform 300ms $curve-springy;
+  // position: absolute;
+  // max-height: 72px;
+  transition: transform $loader-scale-duration $curve-springy;
+              // max-height 0s linear 300ms;
   margin: 0 auto;
+  position: relative;
+  top: 50%;
+  margin-top: -36px;
 
   &:before {
     animation: rotate 512ms infinite $curve-swing;
@@ -86,6 +111,9 @@ $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
   &.braintree-loader__indicator--inactive {
     transform: scale(0);
+    // display: none; 
+    // max-height: 0px;
+    // transition: max-height 0s linear 300ms;
   }
 }
 
@@ -116,8 +144,43 @@ $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   transform: translateY(30px);
 }
 
+.braintree-upper-container {
+  position: relative;
+  border-radius: 4px;
+  // box-shadow: 0 0 0 1px $border-color; 
+  min-height: $initial-container-height;
+  opacity: 1;
+  transition: box-shadow 0.3s linear 1s, padding 0.3s linear;
+  width: 100%;
+  z-index: 2;
+  // padding: 30px 0;
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 3px;
+    display: block;
+    width: 98.28%;
+    height: 99%;
+    border: 1px solid $border-color;
+    transition: border-width 3000ms linear 300ms;
+    border-radius: 4px;
+    z-index: -2;
+  }
+}
+
+.braintree-upper-container--loaded {
+  // box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 6px $border-color;
+  // padding: 0;
+  &:after {
+    border-width: 0px;
+  }
+}
+
+// Hide payment options until they should be shown
 .braintree-options {
-  display: none;
+  // display: none;
+  max-height: 0px;
 }
 
 .braintree-options-list {
@@ -599,10 +662,27 @@ $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .braintree-methods {
-  display: none;
-  margin: 0 auto 13px auto;
+  // display: none;
+  margin: 0 auto;
+  // max-height: 0px;
+  // transition: max-height 3000ms;
 }
 
+.braintree-methods-foo {
+  // display: none !important;
+  max-height: 0px;
+  transition: max-height 3000ms,
+              opacity 300ms linear 1s;
+  opacity: 0;
+  // overflow: hidden;
+}
+
+.braintree-methods-bar {
+  max-height: 1000px;
+  opacity: 1;
+}
+
+// todo: use a different method of showing things
 .braintree-methods .braintree-methods,
 .braintree-options .braintree-options,
 .braintree-paypal .braintree-paypal,
