@@ -8,6 +8,7 @@ var sheetViews = require('./payment-sheet-views');
 var PaymentMethodsView = require('./payment-methods-view');
 var PaymentOptionsView = require('./payment-options-view');
 var supportsFlexbox = require('../lib/supports-flexbox');
+var transitionHelper = require('../lib/transition-helper');
 
 function MainView() {
   BaseView.apply(this, arguments);
@@ -23,7 +24,7 @@ MainView.prototype.constructor = MainView;
 // TODO: why is this called twice?
 MainView.prototype._initialize = function () {
   var hasMultiplePaymentOptions = this.model.supportedPaymentOptions.length > 1;
-  var paymentMethodsViews, paymentOptionsView;
+  var paymentOptionsView;
   var paymentMethods = this.model.getPaymentMethods();
 
   this._views = {};
@@ -50,8 +51,6 @@ MainView.prototype._initialize = function () {
     if (this.model.supportedPaymentOptions.indexOf(sheetViewKey) !== -1) {
       PaymentSheetView = sheetViews[sheetViewKey];
 
-      debugger;
-
       paymentSheetView = new PaymentSheetView({
         element: this.getElementById(PaymentSheetView.ID),
         mainView: this,
@@ -67,14 +66,14 @@ MainView.prototype._initialize = function () {
     return ids;
   }.bind(this), []);
 
-  paymentMethodsViews = new PaymentMethodsView({
+  this.paymentMethodsViews = new PaymentMethodsView({
     // Can't do this anymore because the method-label is outside our "methods" div
     // element: this.getElementById(PaymentMethodsView.ID),
     element: this.element,
     model: this.model,
     strings: this.strings
   });
-  this.addView(paymentMethodsViews);
+  this.addView(this.paymentMethodsViews);
 
   this.toggle.addEventListener('click', this.toggleAdditionalOptions.bind(this));
 
@@ -84,13 +83,13 @@ MainView.prototype._initialize = function () {
 
   this.model.on('changeActivePaymentView', function (id) {
     if (id === PaymentMethodsView.ID) {
-      classlist.add(paymentMethodsViews.container, 'braintree-methods--active');
+      classlist.add(this.paymentMethodsViews.container, 'braintree-methods--active');
       classlist.remove(this.sheetContainer, 'braintree-sheet--active');
     } else {
       setTimeout(function () {
         classlist.add(this.sheetContainer, 'braintree-sheet--active');
       }.bind(this), 0);
-      classlist.remove(paymentMethodsViews.container, 'braintree-methods--active');
+      classlist.remove(this.paymentMethodsViews.container, 'braintree-methods--active');
     }
   }.bind(this));
 
@@ -136,6 +135,8 @@ MainView.prototype.setPrimaryView = function (id) {
     if (this.model.getPaymentMethods().length > 0 || this.getView(PaymentOptionsView.ID)) {
       this.showToggle();
 
+      this.paymentMethodsViews.hideMethodsLabel();
+
       // ???
 
       // Move options below the upper-container
@@ -143,6 +144,7 @@ MainView.prototype.setPrimaryView = function (id) {
 
     } else {
       this.hideToggle();
+      // this.paymentMethodsViews.showMethodsLabel();
     }
   } else if (id === PaymentMethodsView.ID) {
     this.showToggle();
@@ -154,6 +156,7 @@ MainView.prototype.setPrimaryView = function (id) {
 
   } else if (id === PaymentOptionsView.ID) {
     this.hideToggle();
+    // this.paymentMethodsViews.showMethodsLabel();
   }
 
   if (!this.supportsFlexbox) {
@@ -182,20 +185,19 @@ MainView.prototype.requestPaymentMethod = function (callback) {
 };
 
 MainView.prototype.hideLoadingIndicator = function () {
-  // classlist.add(this.getElementById('methods'), 'braintree-methods--loading');
+  var methodsDiv = this.getElementById('methods');
+  var transitionCallback;
 
-  setTimeout(function () {
-    classlist.add(this.loadingIndicator, 'braintree-loader__indicator--inactive');
-    classlist.add(this.loadingContainer, 'braintree-loader__container--inactive');
+  transitionCallback = function () {
+    classlist.add(methodsDiv, 'braintree-methods-opaque');
+    methodsDiv.removeEventListener('transitionend', transitionCallback); // what happens here in IE9?
+  };
 
-    setTimeout(function () {
-      classlist.add(this.getElementById('methods'), 'braintree-methods-bar');
+  transitionHelper.onTransitionEnd(methodsDiv, 'max-height', transitionCallback);
 
-      setTimeout(function () {
-        classlist.add(this.getElementById('upper-container'), 'braintree-upper-container--loaded');
-      }.bind(this), 300);
-    }.bind(this), 300);
-  }.bind(this), 200);
+  classlist.add(this.loadingIndicator, 'braintree-loader__indicator--inactive');
+  classlist.add(this.loadingContainer, 'braintree-loader__container--inactive');
+  classlist.add(methodsDiv, 'braintree-methods-bar');
 
   // setTimeout(function () {
   //   classlist.add(this.loadingContainer, 'braintree-loader__container--inactive');
@@ -209,6 +211,7 @@ MainView.prototype.toggleAdditionalOptions = function () {
   var isPaymentSheetView = this.paymentSheetViewIDs.indexOf(this.primaryView.ID) !== -1;
 
   this.hideToggle();
+  this.paymentMethodsViews.showMethodsLabel();
 
   if (!hasMultiplePaymentOptions) {
     sheetViewID = this.paymentSheetViewIDs[0];

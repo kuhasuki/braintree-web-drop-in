@@ -1,6 +1,7 @@
 'use strict';
 
 var BaseView = require('./base-view');
+var classlist = require('../lib/classlist');
 var PaymentMethodView = require('./payment-method-view');
 
 var PAYMENT_METHOD_TYPE_TO_TRANSLATION_STRING = {
@@ -32,6 +33,16 @@ PaymentMethodsView.prototype._initialize = function () {
   for (i = paymentMethods.length - 1; i >= 0; i--) {
     this._addPaymentMethod(paymentMethods[i]);
   }
+
+  this.showMethodsLabel();
+};
+
+PaymentMethodsView.prototype.hideMethodsLabel = function () {
+  classlist.add(this._headingLabel, 'braintree-heading--inactive');
+}
+
+PaymentMethodsView.prototype.showMethodsLabel = function () {
+  classlist.remove(this._headingLabel, 'braintree-heading--inactive');
 };
 
 PaymentMethodsView.prototype._getPaymentMethodString = function () {
@@ -60,6 +71,9 @@ PaymentMethodsView.prototype._addPaymentMethod = function (paymentMethod) {
   }
 
   this.views.push(paymentMethodView);
+
+  // todo: check that this is needed
+  // classlist.remove(this._headingLabel, 'braintree-heading--inactive');
 };
 
 PaymentMethodsView.prototype._changeActivePaymentMethodView = function (paymentMethod) {
@@ -78,6 +92,9 @@ PaymentMethodsView.prototype._changeActivePaymentMethodView = function (paymentM
     previousActiveMethodView.setActive(false);
   }
   this.activeMethodView.setActive(true);
+
+  // todo: check that this is needed
+  // classlist.remove(this._headingLabel, 'braintree-heading--inactive');
 };
 
 PaymentMethodsView.prototype.requestPaymentMethod = function (callback) {

@@ -159,25 +159,19 @@ $initial-container-height: 140px;
     content: "";
     position: absolute;
     top: 0px;
+    bottom: 5px;
     left: 3px;
     display: block;
     width: 98.28%;
-    height: 99%;
+    // height: 99%;
     border: 1px solid $border-color;
-    transition: border-width 1000ms linear 600ms;
+    transition: border-width 3000ms linear 300ms;
     border-radius: 4px;
     z-index: -3;
     background-color: $background-color;
   }
 }
 
-.braintree-upper-container--loaded {
-  // box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 6px $border-color;
-  // padding: 0;
-  &:after {
-    border-width: 0px; // Note: Doesn't look like anything in most viewport sizes
-  }
-}
 
 // Hide payment options until they should be shown
 .braintree-options {
@@ -421,6 +415,7 @@ $initial-container-height: 140px;
 }
 
 .braintree-sheet__content--button {
+  min-height: 84px;
   padding: 20px;
   text-align: center;
 }
@@ -673,14 +668,19 @@ $initial-container-height: 140px;
   // display: none !important;
   max-height: 0px;
   opacity: 0;
+  // This is required to prevent covering the merchant's page with an invisible list of payment methods
   // overflow: hidden;
+  display: none;
 }
 
 .braintree-show-methods .braintree-methods-bar {
   max-height: 1000px;
+  transition: max-height 3000ms $curve-easeOutBack;
+}
+
+.braintree-show-methods .braintree-methods-opaque {
   opacity: 1;
-  transition: max-height 3000ms,
-              opacity 300ms linear 1s;
+  transition: opacity 200ms linear;
 }
 
 // todo: rename one of these
