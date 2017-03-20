@@ -26,7 +26,7 @@ $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   margin: 0;
   padding: 0;
 
-  &.braintree-hidden {
+  .braintree-hidden {
     height: 0;
     margin: 0;
     opacity: 0;
@@ -55,6 +55,7 @@ $initial-container-height: 140px;
   // justify-content: center;       
   width: 100%;                   
   height: $initial-container-height;                  
+  // min-height: $initial-container-height;
   opacity: 1;                    
   z-index: 2;                    
   transition: opacity 500ms ease;
@@ -137,7 +138,12 @@ $initial-container-height: 140px;
 .braintree-heading {
   font-size: 16px;
   color: $text-color;
-  margin: 5px 5px 10px 5px;
+  // padding-bottom: 10px;
+  // padding-left: 5px;
+  margin-left: 5px;
+  margin-bottom: 10px;
+
+  // margin: 5px 5px 10px 5px;
   transition: transform 0.2s ease;
 }
 
@@ -148,13 +154,12 @@ $initial-container-height: 140px;
 .braintree-upper-container {
   position: relative;
   border-radius: 4px;
-  // box-shadow: 0 0 0 1px $border-color; 
   min-height: $initial-container-height;
   opacity: 1;
   transition: box-shadow 0.3s linear 1s, padding 0.3s linear;
   width: 100%;
   z-index: 2;
-  // padding: 30px 0;
+
   &:after {
     content: "";
     position: absolute;
@@ -164,6 +169,7 @@ $initial-container-height: 140px;
     display: block;
     width: 98.28%;
     // height: 99%;
+    // min-height: $initial-container-height;
     border: 1px solid $border-color;
     transition: border-width 3000ms linear 300ms;
     border-radius: 4px;
@@ -177,6 +183,7 @@ $initial-container-height: 140px;
 .braintree-options {
   // display: none;
   max-height: 0px;
+  transition: opacity 1s;
   overflow: hidden;
 }
 
@@ -658,14 +665,15 @@ $initial-container-height: 140px;
 }
 
 .braintree-methods {
-  // display: none;
   margin: 0 auto;
+
+  // Make braintree-methods go away when options are shown?
   // max-height: 0px;
-  // transition: max-height 3000ms;
+  display: none;
 }
 
+
 .braintree-methods-foo {
-  // display: none !important;
   max-height: 0px;
   opacity: 0;
   // This is required to prevent covering the merchant's page with an invisible list of payment methods
@@ -675,7 +683,9 @@ $initial-container-height: 140px;
 
 .braintree-show-methods .braintree-methods-bar {
   max-height: 1000px;
-  transition: max-height 3000ms $curve-easeOutBack;
+  transition: max-height 300ms $curve-easeOutBack;
+
+  // overflow: auto; // ?
 }
 
 .braintree-show-methods .braintree-methods-opaque {
@@ -683,7 +693,6 @@ $initial-container-height: 140px;
   transition: opacity 200ms linear;
 }
 
-// todo: rename one of these
 .braintree-show-methods .braintree-methods,
 .braintree-show-options .braintree-options,
 .braintree-show-paypal .braintree-paypal,
@@ -691,18 +700,24 @@ $initial-container-height: 140px;
   display: block;
 }
 
+.braintree-show-methods,
+.braintree-show-options,
+.braintree-show-paypal,
+.braintree-show-card {
+  [data-braintree-id="placeholder-label"] {
+    display: none;
+  }
+}
+
 // braintree-options is hidden with a max-height: 0px
 // Show it by setting max-height: none
 .braintree-show-options .braintree-options {
+  opacity: 1;
   max-height: none;
 }
 
 [data-braintree-id="other-ways-to-pay"] {
   display: none;
-}
-
-[data-braintree-id="choose-a-way-to-pay"] {
-  display: block;
 }
 
 .braintree-show-methods [data-braintree-id="other-ways-to-pay"],
@@ -712,9 +727,16 @@ $initial-container-height: 140px;
 }
 
 // .braintree-loading [data-braintree-id="methods-label"],
-.braintree-loading [data-braintree-id="choose-a-way-to-pay"],
-.braintree-show-methods [data-braintree-id="choose-a-way-to-pay"],
-.braintree-show-paypal [data-braintree-id="choose-a-way-to-pay"],
-.braintree-show-card [data-braintree-id="choose-a-way-to-pay"] {
-  display: none;
+// .braintree-loading [data-braintree-id="choose-a-way-to-pay"],
+// .braintree-show-methods [data-braintree-id="choose-a-way-to-pay"],
+// .braintree-show-paypal [data-braintree-id="choose-a-way-to-pay"],
+// .braintree-show-card [data-braintree-id="choose-a-way-to-pay"] {
+//   display: none;
+// }
+
+.braintree-show-options .braintree-upper-container {
+  min-height: 70px;
+  transition: min-height 0.3s;
 }
+
+

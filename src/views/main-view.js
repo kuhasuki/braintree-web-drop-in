@@ -156,6 +156,10 @@ MainView.prototype.setPrimaryView = function (id) {
 
   } else if (id === PaymentOptionsView.ID) {
     this.hideToggle();
+
+    classlist.remove(this.getElementById('choose-a-way-to-pay'), 'braintree-heading--inactive');
+
+
     // this.paymentMethodsViews.showMethodsLabel();
   }
 
@@ -221,6 +225,11 @@ MainView.prototype.toggleAdditionalOptions = function () {
   } else if (isPaymentSheetView) {
     if (this.model.getPaymentMethods().length === 0) {
       this.setPrimaryView(PaymentOptionsView.ID);
+
+
+
+
+
     } else {
       this.setPrimaryView(PaymentMethodsView.ID);
       this.hideToggle();
