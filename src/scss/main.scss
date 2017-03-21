@@ -50,16 +50,11 @@ $initial-container-height: 140px;
 
 .braintree-loader__container {
   position: absolute;
-  // display: flex;                 
-  // align-items: center;           
-  // justify-content: center;       
   width: 100%;                   
   height: $initial-container-height;                  
-  // min-height: $initial-container-height;
   opacity: 1;                    
   z-index: 2;                    
   transition: opacity 500ms ease;
-  // max-height: 140px;
 
   &.braintree-loader__container--inactive {
 
@@ -88,10 +83,7 @@ $initial-container-height: 140px;
   border-radius: 50%;
   height: 72px;
   width: 72px;
-  // position: absolute;
-  // max-height: 72px;
   transition: transform $loader-scale-duration $curve-springy;
-              // max-height 0s linear 300ms;
   margin: 0 auto;
   position: relative;
   top: 50%;
@@ -113,9 +105,6 @@ $initial-container-height: 140px;
 
   &.braintree-loader__indicator--inactive {
     transform: scale(0);
-    // display: none; 
-    // max-height: 0px;
-    // transition: max-height 0s linear 300ms;
   }
 }
 
@@ -138,18 +127,15 @@ $initial-container-height: 140px;
 .braintree-heading {
   font-size: 16px;
   color: $text-color;
-  // padding-bottom: 10px;
-  // padding-left: 5px;
-  margin-left: 5px;
   margin-bottom: 10px;
+  margin-left: 5px;
+  transition: transform 200ms ease;
 
-  // margin: 5px 5px 10px 5px;
-  transition: transform 0.2s ease;
+  &.braintree-heading--inactive {
+    transform: translateY(30px);
+  }
 }
 
-.braintree-heading--inactive {
-  transform: translateY(30px);
-}
 
 .braintree-upper-container {
   position: relative;
@@ -168,8 +154,6 @@ $initial-container-height: 140px;
     left: 3px;
     display: block;
     width: 98.28%;
-    // height: 99%;
-    // min-height: $initial-container-height;
     border: 1px solid $border-color;
     transition: border-width 3000ms linear 300ms;
     border-radius: 4px;
@@ -178,12 +162,11 @@ $initial-container-height: 140px;
   }
 }
 
-
 // Hide payment options until they should be shown
 .braintree-options {
-  // display: none;
   max-height: 0px;
   transition: opacity 1s;
+  opacity: 0;
   overflow: hidden;
 }
 
@@ -681,17 +664,28 @@ $initial-container-height: 140px;
   display: none;
 }
 
-.braintree-show-methods .braintree-methods-bar {
+.braintree-loaded [data-braintree-id="methods"],
+.braintree-loaded [data-braintree-id="options"] {
   max-height: 1000px;
-  transition: max-height 300ms $curve-easeOutBack;
-
-  // overflow: auto; // ?
-}
-
-.braintree-show-methods .braintree-methods-opaque {
   opacity: 1;
-  transition: opacity 200ms linear;
+  transition: max-height 250ms $curve-easeOutBack,
+    opacity 300ms linear 100ms;
 }
+
+// .braintree-show-methods .braintree-methods-bar {
+//   max-height: 1000px;
+//   // transition: max-height 3000ms $curve-easeOutBack;
+//
+//   opacity: 1;
+//   transition: max-height 250ms $curve-easeOutBack,
+//     opacity 300ms linear 100ms;
+//   // overflow: auto; // ?
+// }
+
+// .braintree-show-methods .braintree-methods-opaque {
+//   opacity: 1;
+//   transition: opacity 200ms linear 2500ms;
+// }
 
 .braintree-show-methods .braintree-methods,
 .braintree-show-options .braintree-options,
@@ -705,18 +699,32 @@ $initial-container-height: 140px;
 .braintree-show-paypal,
 .braintree-show-card {
   [data-braintree-id="placeholder-label"] {
+    // State: Drop-in has finished loading
     display: none;
   }
 }
 
 // braintree-options is hidden with a max-height: 0px
 // Show it by setting max-height: none
+
 .braintree-show-options .braintree-options {
+  max-height: none; //.braintree-show-options .braintree-options
   opacity: 1;
-  max-height: none;
 }
 
-[data-braintree-id="other-ways-to-pay"] {
+[data-braintree-id="other-ways-to-pay"],
+[data-braintree-id="choose-a-way-to-pay"] {
+  // State: There are Methods and toggle has not been clicked
+  display: none;
+}
+
+.braintree-show-options [data-braintree-id="choose-a-way-to-pay"] {
+  // State: There are no Methods
+  display: block;
+}
+
+.braintree-show-methods [data-braintree-id="choose-a-way-to-pay"] {
+  // Need this to override the above
   display: none;
 }
 

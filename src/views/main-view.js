@@ -150,14 +150,21 @@ MainView.prototype.setPrimaryView = function (id) {
     this.showToggle();
 
     // Move options below the upper-container
-    this.getElementById('lower-container').appendChild(this.getElementById('choose-a-way-to-pay'));
+
+    // This is never shown in the lower-container
+    // this.getElementById('lower-container').appendChild(this.getElementById('choose-a-way-to-pay'));
+
+
+
     // this.getElementById('lower-container').appendChild(this.getElementById('other-ways-to-pay'));
     this.getElementById('lower-container').appendChild(this.getElementById('options'));
 
   } else if (id === PaymentOptionsView.ID) {
     this.hideToggle();
 
-    classlist.remove(this.getElementById('choose-a-way-to-pay'), 'braintree-heading--inactive');
+    setTimeout(function () {
+      classlist.remove(this.getElementById('choose-a-way-to-pay'), 'braintree-heading--inactive');
+    }.bind(this), 1);
 
 
     // this.paymentMethodsViews.showMethodsLabel();
@@ -189,19 +196,26 @@ MainView.prototype.requestPaymentMethod = function (callback) {
 };
 
 MainView.prototype.hideLoadingIndicator = function () {
-  var methodsDiv = this.getElementById('methods');
-  var transitionCallback;
+  classlist.add(this.dropinContainer, 'braintree-loaded');
 
-  transitionCallback = function () {
-    classlist.add(methodsDiv, 'braintree-methods-opaque');
-    methodsDiv.removeEventListener('transitionend', transitionCallback); // what happens here in IE9?
-  };
+  // todo: combine indicator--inactive and container--inactive into braintree-loaded?
 
-  transitionHelper.onTransitionEnd(methodsDiv, 'max-height', transitionCallback);
+
+  // var methodsDiv = this.getElementById('methods');
+  // var transitionCallback;
+
+  // transitionCallback = function () {
+  //   classlist.add(methodsDiv, 'braintree-methods-opaque');
+  //   methodsDiv.removeEventListener('transitionend', transitionCallback); // what happens here in IE9?
+  // };
+  //
+  // transitionHelper.onTransitionEnd(methodsDiv, 'max-height', transitionCallback);
 
   classlist.add(this.loadingIndicator, 'braintree-loader__indicator--inactive');
   classlist.add(this.loadingContainer, 'braintree-loader__container--inactive');
-  classlist.add(methodsDiv, 'braintree-methods-bar');
+  // classlist.add(methodsDiv, 'braintree-methods-bar');
+
+  // classlist.add(methodsDiv, 'braintree-methods-opaque');
 
   // setTimeout(function () {
   //   classlist.add(this.loadingContainer, 'braintree-loader__container--inactive');
