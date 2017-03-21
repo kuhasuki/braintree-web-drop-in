@@ -124,7 +124,9 @@ MainView.prototype.setPrimaryView = function (id) {
     this.primaryView.closeFrame();
   }
 
-  this.element.className = prefixShowClass(id);
+  setTimeout(function () {
+    this.element.className = prefixShowClass(id);
+  }.bind(this), 1);
   this.primaryView = this.getView(id);
   this.model.changeActivePaymentView(id);
 
@@ -175,7 +177,10 @@ MainView.prototype.requestPaymentMethod = function (callback) {
 };
 
 MainView.prototype.hideLoadingIndicator = function () {
-  classlist.add(this.dropinContainer, 'braintree-loaded');
+  // todo: remove
+  setTimeout(function () {
+    classlist.add(this.dropinContainer, 'braintree-loaded');
+  }.bind(this), 2000);
 
   // todo: could these classes be combined with braintree-loaded?
   classlist.add(this.loadingIndicator, 'braintree-loader__indicator--inactive');
