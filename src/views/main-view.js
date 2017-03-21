@@ -21,7 +21,6 @@ function MainView() {
 MainView.prototype = Object.create(BaseView.prototype);
 MainView.prototype.constructor = MainView;
 
-// TODO: why is this called twice?
 MainView.prototype._initialize = function () {
   var hasMultiplePaymentOptions = this.model.supportedPaymentOptions.length > 1;
   var paymentOptionsView;
@@ -67,8 +66,6 @@ MainView.prototype._initialize = function () {
   }.bind(this), []);
 
   this.paymentMethodsViews = new PaymentMethodsView({
-    // Can't do this anymore because the method-label is outside our "methods" div
-    // element: this.getElementById(PaymentMethodsView.ID),
     element: this.element,
     model: this.model,
     strings: this.strings
@@ -133,44 +130,23 @@ MainView.prototype.setPrimaryView = function (id) {
 
   if (this.paymentSheetViewIDs.indexOf(id) !== -1) {
     if (this.model.getPaymentMethods().length > 0 || this.getView(PaymentOptionsView.ID)) {
-      this.showToggle();
-
+      // Customer just clicked a payment option
+      this.showToggle(); // Show 'Choose another way to pay'
       this.paymentMethodsViews.hideMethodsLabel();
-
-      // ???
-
-      // Move options below the upper-container
-      // this.getElementById('lower-container').appendChild(this.getElementById('options'));
-
-      // Customer just clicked a payment option and the sheet is now visible
-      // 'Choose another way to pay' has appeared
-
     } else {
       this.hideToggle();
-      // this.paymentMethodsViews.showMethodsLabel();
     }
   } else if (id === PaymentMethodsView.ID) {
     this.showToggle();
-
     // Move options below the upper-container
-
-    // This is never shown in the lower-container
-    // this.getElementById('lower-container').appendChild(this.getElementById('choose-a-way-to-pay'));
-
-
-
-    // this.getElementById('lower-container').appendChild(this.getElementById('other-ways-to-pay'));
     this.getElementById('lower-container').appendChild(this.getElementById('options'));
-
   } else if (id === PaymentOptionsView.ID) {
     this.hideToggle();
 
+    // Animation doesn't show without setTimeout
     setTimeout(function () {
       classlist.remove(this.getElementById('choose-a-way-to-pay'), 'braintree-heading--inactive');
     }.bind(this), 1);
-
-
-    // this.paymentMethodsViews.showMethodsLabel();
   }
 
   if (!this.supportsFlexbox) {
@@ -201,29 +177,9 @@ MainView.prototype.requestPaymentMethod = function (callback) {
 MainView.prototype.hideLoadingIndicator = function () {
   classlist.add(this.dropinContainer, 'braintree-loaded');
 
-  // todo: combine indicator--inactive and container--inactive into braintree-loaded?
-
-
-  // var methodsDiv = this.getElementById('methods');
-  // var transitionCallback;
-
-  // transitionCallback = function () {
-  //   classlist.add(methodsDiv, 'braintree-methods-opaque');
-  //   methodsDiv.removeEventListener('transitionend', transitionCallback); // what happens here in IE9?
-  // };
-  //
-  // transitionHelper.onTransitionEnd(methodsDiv, 'max-height', transitionCallback);
-
+  // todo: could these classes be combined with braintree-loaded?
   classlist.add(this.loadingIndicator, 'braintree-loader__indicator--inactive');
   classlist.add(this.loadingContainer, 'braintree-loader__container--inactive');
-  // classlist.add(methodsDiv, 'braintree-methods-bar');
-
-  // classlist.add(methodsDiv, 'braintree-methods-opaque');
-
-  // setTimeout(function () {
-  //   classlist.add(this.loadingContainer, 'braintree-loader__container--inactive');
-  //   classlist.remove(this.dropinContainer, 'braintree-hidden');
-  // }.bind(this), 200);
 };
 
 MainView.prototype.toggleAdditionalOptions = function () {
@@ -242,11 +198,6 @@ MainView.prototype.toggleAdditionalOptions = function () {
   } else if (isPaymentSheetView) {
     if (this.model.getPaymentMethods().length === 0) {
       this.setPrimaryView(PaymentOptionsView.ID);
-
-
-
-
-
     } else {
       this.setPrimaryView(PaymentMethodsView.ID);
       this.hideToggle();
