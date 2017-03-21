@@ -140,7 +140,10 @@ MainView.prototype.setPrimaryView = function (id) {
       // ???
 
       // Move options below the upper-container
-      this.getElementById('lower-container').appendChild(this.getElementById('options'));
+      // this.getElementById('lower-container').appendChild(this.getElementById('options'));
+
+      // Customer just clicked a payment option and the sheet is now visible
+      // 'Choose another way to pay' has appeared
 
     } else {
       this.hideToggle();
