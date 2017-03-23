@@ -40,7 +40,6 @@ $loader-scale-duration: 300ms;
     margin: 0;
     opacity: 0;
     overflow: hidden;
-    transition: all 100ms linear;
     visibility: hidden;
   }
 }
@@ -52,7 +51,6 @@ $loader-scale-duration: 300ms;
   height: $initial-container-height;
   opacity: 1;
   position: absolute;
-  transition: opacity 500ms ease;
   width: 100%;
   z-index: 2;
 
@@ -180,19 +178,13 @@ $loader-scale-duration: 300ms;
 /* =========================================================================
    Upper Container
    ========================================================================= */
-.braintree-show-options .braintree-upper-container {
-  min-height: 70px;
-  // min-height: none;
-  transition: min-height 600ms;
-}
-
 .braintree-upper-container {
   border-radius: $radius-default;
   // todo: uncomment once we have the growing animation working for options
   min-height: $initial-container-height;
   opacity: 1;
   position: relative;
-  transition: box-shadow 0.3s linear 1s, padding 0.3s linear;
+  transition: min-height 600ms;
   width: 100%;
   z-index: 2;
 
@@ -201,15 +193,18 @@ $loader-scale-duration: 300ms;
     border: 1px solid $border-color;
     border-radius: $radius-default;
     bottom: 5px;
-    content: ' ';
+    content: '';
     display: block;
     left: 3px;
     position: absolute;
     top: 0;
-    transition: border-width 3000ms linear 300ms;
     width: 98.28%;
     z-index: -3;
   }
+}
+
+.braintree-show-options .braintree-upper-container {
+  min-height: 70px;
 }
 
 /* =========================================================================
@@ -292,7 +287,7 @@ $loader-scale-duration: 300ms;
   display: none;
   margin: 0 auto;
   max-height: 500px;
-  transition: box-shadow 300ms, transform 300ms, opacity 300ms, max-height 300ms ease;
+  transition: transform 300ms, opacity 300ms, max-height 300ms ease;
   width: 99%;
 }
 
@@ -573,9 +568,8 @@ $loader-scale-duration: 300ms;
   }
 
   .braintree-method__logo {
-    display: flex;
-
     align-items: center;
+    display: flex;
     justify-content: center;
   }
 
@@ -585,7 +579,6 @@ $loader-scale-duration: 300ms;
     font-size: 16px;
     margin-left: 20px;
     text-align: left;
-    transition: font-weight 300;
 
     .braintree-method__label--small {
       font-size: 11px;
@@ -630,6 +623,7 @@ $loader-scale-duration: 300ms;
     font-weight: bold;
   }
 }
+
 
 .braintree-method__check-container {
   position: relative;
@@ -683,7 +677,8 @@ $loader-scale-duration: 300ms;
 /* =========================================================================
    Javascript hooks
    ========================================================================= */
-.braintree-loaded [data-braintree-id='methods'], .braintree-loaded [data-braintree-id='options'] {
+.braintree-loaded [data-braintree-id='methods'],
+.braintree-loaded [data-braintree-id='options'] {
   max-height: 1000px; // Must set specific value here in order to have animation
   opacity: 1;
   transition: max-height 250ms $curve-easeOutBack, opacity 300ms linear 100ms;
