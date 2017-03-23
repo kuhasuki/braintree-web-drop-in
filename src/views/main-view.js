@@ -32,6 +32,7 @@ MainView.prototype._initialize = function () {
   this.sheetErrorText = this.getElementById('sheet-error-text');
 
   this.toggle = this.getElementById('toggle');
+  this.lowerContainer = this.getElementById('lower-container');
 
   this.loadingContainer = this.getElementById('loading-container');
   this.loadingIndicator = this.getElementById('loading-indicator');
@@ -178,9 +179,9 @@ MainView.prototype.requestPaymentMethod = function (callback) {
 
 MainView.prototype.hideLoadingIndicator = function () {
   // todo: remove
-  setTimeout(function () {
+  // setTimeout(function () {
     classlist.add(this.dropinContainer, 'braintree-loaded');
-  }.bind(this), 2000);
+  // }.bind(this), 2000);
 
   // todo: could these classes be combined with braintree-loaded?
   classlist.add(this.loadingIndicator, 'braintree-loader__indicator--inactive');
@@ -215,10 +216,12 @@ MainView.prototype.toggleAdditionalOptions = function () {
 
 MainView.prototype.showToggle = function () {
   classlist.remove(this.toggle, 'braintree-hidden');
+  classlist.add(this.lowerContainer, 'braintree-hidden');
 };
 
 MainView.prototype.hideToggle = function () {
   classlist.add(this.toggle, 'braintree-hidden');
+  classlist.remove(this.lowerContainer, 'braintree-hidden');
 };
 
 MainView.prototype.showSheetError = function (error) {

@@ -10,6 +10,9 @@ $curve-swing: cubic-bezier(0.645, 0.045, 0.355, 1);
 $curve-springy: cubic-bezier(0.43, 0.48, 0.62, 1.07);
 $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
+$loader-scale-duration: 300ms;
+$initial-container-height: 140px;
+
 [data-braintree-id="wrapper"] {
   // dropin.js has display = 'none' to prevent flicker before CSS has loaded
   display: block !important;
@@ -43,9 +46,6 @@ $curve-easeOutBack: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   margin-left: -7px;
   fill: $black-40;
 }
-
-$loader-scale-duration: 300ms;
-$initial-container-height: 140px;
 
 .braintree-loader__container {
   position: absolute;
@@ -118,7 +118,6 @@ $initial-container-height: 140px;
   }
 }
 
-
 .braintree-upper-container {
   position: relative;
   border-radius: 4px;
@@ -130,8 +129,8 @@ $initial-container-height: 140px;
   width: 100%;
   z-index: 2;
 
-  &:after {
-    content: "";
+  &:before {
+    content: " ";
     position: absolute;
     top: 0px;
     bottom: 5px;
@@ -147,16 +146,18 @@ $initial-container-height: 140px;
 }
 
 .braintree-options {
-  // overflow: hidden;
   margin: 0 auto;
-  display: none;
+
+  // Problem:
+  // display: none;
 }
 
 .braintree-options-initial {
   max-height: 0px;
   opacity: 0;
-  // transition: opacity 300ms;
-  display: none;
+
+  // Problem:
+  // display: none;
 }
 
 .braintree-options-list {
@@ -651,10 +652,10 @@ $initial-container-height: 140px;
 .braintree-loaded [data-braintree-id="options"] {
   max-height: 1000px; // Must set specific value here in order to have animation
   opacity: 1;
-  // transition: max-height 250ms $curve-easeOutBack,
-  transition: max-height 2500ms $curve-easeOutBack,
-    // opacity 300ms linear 100ms;
-    opacity 3000ms linear 1000ms;
+  transition: max-height 250ms $curve-easeOutBack,
+  // transition: max-height 2500ms $curve-easeOutBack,
+    opacity 300ms linear 100ms;
+    // opacity 3000ms linear 1000ms;
 }
 
 // .braintree-loaded [data-braintree-id="options"] {
@@ -676,6 +677,11 @@ $initial-container-height: 140px;
   [data-braintree-id="placeholder-label"] {
     display: none;
   }
+}
+
+// prevent 1px when heading had loaded
+.braintree-placeholder .braintree-heading {
+  // margin-top: -10px;
 }
 
 // .braintree-show-options .braintree-options {
@@ -706,5 +712,5 @@ $initial-container-height: 140px;
 .braintree-show-options .braintree-upper-container {
   min-height: 70px;
   // min-height: none;
-  transition: min-height 0.3s;
+  transition: min-height 600ms;
 }
