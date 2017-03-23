@@ -235,6 +235,7 @@ $loader-scale-duration: 300ms;
 }
 
 .braintree-option {
+  align-items: center;
   background-color: $background-color;
   border-color: $border-color;
   border-style: solid;
@@ -242,8 +243,6 @@ $loader-scale-duration: 300ms;
   cursor: pointer;
   display: flex;
   padding: 12px 10px;
-
-  align-items: center;
 
   &.braintree-disabled {
     background: #EAEAEA;
@@ -328,6 +327,7 @@ $loader-scale-duration: 300ms;
 }
 
 .braintree-sheet--has-error .braintree-sheet__error {
+  align-items: center;
   background-color: $error-color;
   border-color: $error-color;
   border-radius: 0 0 $radius-default $radius-default;
@@ -336,8 +336,6 @@ $loader-scale-duration: 300ms;
   display: flex;
   padding: 6px;
   position: relative;
-
-  align-items: center;
 
   .braintree-sheet__error-icon {
     height: 24px;
@@ -381,13 +379,12 @@ $loader-scale-duration: 300ms;
 }
 
 .braintree-sheet__header {
+  align-items: center;
   border-bottom: 1px solid $border-color;
   display: flex;
+  flex-wrap: wrap;
   padding: 12px 15px 0 12px;
   position: relative;
-
-  align-items: center;
-  flex-wrap: wrap;
 
   .braintree-sheet__header-label {
     align-items: center;
@@ -397,11 +394,10 @@ $loader-scale-duration: 300ms;
   }
 
   .braintree-sheet__logo--header {
+    align-items: center;
     display: flex;
     text-align: center;
     width: 50px;
-
-    align-items: center;
   }
 
   .braintree-sheet__card-icon {
@@ -547,6 +543,7 @@ $loader-scale-duration: 300ms;
    Payment Methods
    ========================================================================= */
 .braintree-method {
+  align-items: center;
   background-color: white;
   border-color: $border-color;
   border-style: solid;
@@ -554,15 +551,13 @@ $loader-scale-duration: 300ms;
   box-shadow: none;
   cursor: pointer;
   display: flex;
+  justify-content: space-between;
   margin: 0 auto;
   padding: 14px 10px;
   position: relative;
   transition: opacity 300ms, box-shadow 300ms, width 200ms $curve-easeOutBack, border-color 300ms, border-radius 300ms;
   width: 99%;
   z-index: 0;
-
-  align-items: center;
-  justify-content: space-between;
 
   &:first-child {
     border-radius: $radius-default $radius-default 0 0;
@@ -586,12 +581,11 @@ $loader-scale-duration: 300ms;
 
   .braintree-method__label {
     color: $text-color;
+    flex-grow: 1;
     font-size: 16px;
     margin-left: 20px;
     text-align: left;
     transition: font-weight 300;
-
-    flex-grow: 1;
 
     .braintree-method__label--small {
       font-size: 11px;
@@ -602,14 +596,13 @@ $loader-scale-duration: 300ms;
   .braintree-method__check {
     background-color: $background-color;
     border-radius: 100px;
+    fill: $background-color;
     height: 41px;
     margin-right: 7px;
     padding: 7px 10px 10px;
     transform: scale(0);
     transition: transform 300ms $curve-easeOutBack;
     width: 41px;
-
-    fill: $background-color;
 
     svg {
       width: 100%;
@@ -629,9 +622,8 @@ $loader-scale-duration: 300ms;
 
   .braintree-method__check {
     background-color: $highlight-color;
-    transform: scale(1);
-
     fill: white;
+    transform: scale(1);
   }
 
   .braintree-method__label {
