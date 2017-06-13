@@ -158,6 +158,11 @@
   </div>
 
   <div data-braintree-id="toggle" class="braintree-toggle braintree-hidden" tabindex="0">
-    <span>{{chooseAnotherWayToPay}}</span>
+    <a style="display: inline-block;">
+      <svg height="24" width="40" style="display: inline-block;vertical-align: middle;">
+        <use xlink:href="#logoPayPal" id="way-to-pay-svg-use"></use>
+      </svg>
+      <span id="way-to-pay-span">{{chooseAnotherWayToPay}}</span>
+    </a>
   </div>
 </div>

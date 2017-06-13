@@ -145,6 +145,13 @@ MainView.prototype.setPrimaryView = function (id, secondaryViewId) {
 
   if (this.paymentSheetViewIDs.indexOf(id) !== -1) {
     if (this.model.getPaymentMethods().length > 0 || this.getView(PaymentOptionsView.ID)) {
+      if (id == 'paypal') {
+        document.getElementById("way-to-pay-span").textContent="Credit Card";
+        document.getElementById("way-to-pay-svg-use").setAttribute('xlink:href', '#iconCardFront');
+      } else if (id == 'card') {
+        document.getElementById("way-to-pay-span").textContent="PayPal";
+        document.getElementById("way-to-pay-svg-use").setAttribute('xlink:href', '#logoPayPal');
+      }
       this.showToggle();
     } else {
       this.hideToggle();
@@ -154,7 +161,8 @@ MainView.prototype.setPrimaryView = function (id, secondaryViewId) {
     // Move options below the upper-container
     this.getElementById('lower-container').appendChild(this.getElementById('options'));
   } else if (id === PaymentOptionsView.ID) {
-    this.hideToggle();
+    this.setPrimaryView('card');
+    //this.hideToggle();
   }
 
   if (!this.supportsFlexbox) {
@@ -209,7 +217,12 @@ MainView.prototype.toggleAdditionalOptions = function () {
     this.model.changeActivePaymentView(sheetViewID);
   } else if (isPaymentSheetView) {
     if (this.model.getPaymentMethods().length === 0) {
-      this.setPrimaryView(PaymentOptionsView.ID);
+      //this.setPrimaryView(PaymentOptionsView.ID);
+      if (this.primaryView.ID == 'card') {
+        this.setPrimaryView('paypal');
+      } else if (this.primaryView.ID == 'paypal') {
+        this.setPrimaryView('card');
+      }
     } else {
       this.setPrimaryView(PaymentMethodsView.ID, PaymentOptionsView.ID);
       this.hideToggle();
