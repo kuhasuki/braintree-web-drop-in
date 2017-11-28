@@ -1,0 +1,73 @@
+{
+  "name": "braintree-web-drop-in",
+  "version": "1.9.1",
+  "main": "index.js",
+  "scripts": {
+    "build": "gulp build",
+    "development": "gulp development",
+    "build:gh-pages": "gulp build:gh-pages",
+    "lint": "eslint src test",
+    "pretest": "npm run lint",
+    "test": "karma start test/config/karma.js --single-run",
+    "test:integration": ". ./.env && bundle exec rake sauce:spec test_files=spec",
+    "test:integration:paypal-only": "RUN_PAYPAL_ONLY=true npm run test:integration",
+    "test:integration:paypal-skipped": "SKIP_PAYPAL=true npm run test:integration",
+    "test:publishing": "mocha test/publishing",
+    "deploy:gh-pages": "./scripts/deploy-gh-pages"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/braintree/braintree-web-dropin.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "brfs": "1.4.3",
+    "browserify": "12.0.1",
+    "chai": "3.4.1",
+    "connect": "3.5.0",
+    "del": "2.2.2",
+    "envify": "4.0.0",
+    "eslint": "2.7.0",
+    "eslint-config-braintree": "1.0.2",
+    "finalhandler": "0.5.0",
+    "gulp": "3.9.1",
+    "gulp-autoprefixer": "4.0.0",
+    "gulp-brfs": "0.1.0",
+    "gulp-clean-css": "2.0.13",
+    "gulp-envify": "1.0.0",
+    "gulp-rename": "1.2.2",
+    "gulp-replace": "0.5.4",
+    "gulp-sass": "2.3.2",
+    "gulp-size": "2.1.0",
+    "gulp-streamify": "1.0.2",
+    "gulp-uglify": "2.0.0",
+    "gulp-util": "3.0.7",
+    "is-uuid": "1.0.2",
+    "jsdoc": "3.4.0",
+    "jsdoc-template": "braintree/jsdoc-template#3.1.1",
+    "karma": "0.13.22",
+    "karma-browserify": "5.0.5",
+    "karma-mocha": "1.1.1",
+    "karma-mocha-reporter": "2.0.3",
+    "karma-phantomjs-launcher": "1.0.0",
+    "mkdirp": "0.5.1",
+    "mocha": "3.0.0",
+    "phantomjs-prebuilt": "2.1.13",
+    "run-sequence": "1.2.2",
+    "sauce-connect-launcher": "0.14.0",
+    "serve-static": "1.11.1",
+    "sinon": "2.1.0",
+    "sinon-chai": "2.9.0",
+    "vinyl-source-stream": "1.1.0"
+  },
+  "dependencies": {
+    "braintree-web": "3.26.0",
+    "@braintree/browser-detection": "1.7.0",
+    "promise-polyfill": "6.0.2",
+    "@braintree/wrap-promise": "1.1.1"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "iOS 8"
+  ]
+}
