@@ -1,7 +1,9 @@
 'use strict';
 
+var analytics = require('../../src/lib/analytics');
 var DropinModel = require('../../src/dropin-model');
 var EventEmitter = require('../../src/lib/event-emitter');
+var isHTTPS = require('../../src/lib/is-https');
 var fake = require('../helpers/fake');
 
 describe('DropinModel', function () {
@@ -20,6 +22,11 @@ describe('DropinModel', function () {
       },
       paymentMethods: []
     };
+    this.sandbox.stub(analytics, 'sendEvent');
+
+    this.sandbox.stub(isHTTPS, 'isHTTPS').returns(true);
+    global.ApplePaySession = this.sandbox.stub().returns({});
+    global.ApplePaySession.canMakePayments = this.sandbox.stub().returns(true);
   });
 
   describe('Constructor', function () {
@@ -117,16 +124,17 @@ describe('DropinModel', function () {
         ]);
       });
 
-      it('supports cards, PayPal, and PayPal Credit and defaults to showing them in correct paymentOptionPriority', function () {
+      it('supports cards, PayPal, PayPal Credit, and Apple Pay and defaults to showing them in correct paymentOptionPriority', function () {
         var model;
 
         this.configuration.gatewayConfiguration.paypalEnabled = true;
         this.modelOptions.merchantConfiguration.paypal = true;
         this.modelOptions.merchantConfiguration.paypalCredit = true;
+        this.modelOptions.merchantConfiguration.applePay = true;
 
         model = new DropinModel(this.modelOptions);
 
-        expect(model.supportedPaymentOptions).to.deep.equal(['card', 'paypal', 'paypalCredit']);
+        expect(model.supportedPaymentOptions).to.deep.equal(['card', 'paypal', 'paypalCredit', 'applePay']);
       });
 
       it('uses custom paymentOptionPriority of payment options', function () {
@@ -161,6 +169,39 @@ describe('DropinModel', function () {
         expect(function () {
           new DropinModel(this.modelOptions); // eslint-disable-line no-new
         }.bind(this)).to.throw('paymentOptionPriority: Invalid payment option specified.');
+      });
+
+      it('does not support Apple Pay when the browser does not support Apple Pay', function () {
+        var model;
+
+        delete global.ApplePaySession;
+        this.modelOptions.merchantConfiguration.applePay = true;
+
+        model = new DropinModel(this.modelOptions);
+
+        expect(model.supportedPaymentOptions).to.deep.equal(['card']);
+      });
+
+      it('does not support Apple Pay when the page is not loaded over https', function () {
+        var model;
+
+        isHTTPS.isHTTPS.returns(false);
+        this.modelOptions.merchantConfiguration.applePay = true;
+
+        model = new DropinModel(this.modelOptions);
+
+        expect(model.supportedPaymentOptions).to.deep.equal(['card']);
+      });
+
+      it('does not support Apple Pay when the device does not support Apple Pay', function () {
+        var model;
+
+        global.ApplePaySession.canMakePayments.returns(false);
+        this.modelOptions.merchantConfiguration.applePay = true;
+
+        model = new DropinModel(this.modelOptions);
+
+        expect(model.supportedPaymentOptions).to.deep.equal(['card']);
       });
     });
 
@@ -318,6 +359,38 @@ describe('DropinModel', function () {
     });
   });
 
+  describe('removeActivePaymentMethod', function () {
+    beforeEach(function () {
+      this.model = new DropinModel(this.modelOptions);
+      this.sandbox.stub(this.model, '_emit');
+      this.sandbox.stub(this.model, 'setPaymentMethodRequestable');
+    });
+
+    it('sets active payment method to null', function () {
+      this.model._activePaymentMethod = {foo: 'bar'};
+
+      this.model.removeActivePaymentMethod();
+
+      expect(this.model._activePaymentMethod).to.not.exist;
+    });
+
+    it('emits removeActivePaymentMethod event', function () {
+      this.model.removeActivePaymentMethod();
+
+      expect(this.model._emit).to.be.calledOnce;
+      expect(this.model._emit).to.be.calledWith('removeActivePaymentMethod');
+    });
+
+    it('sets payment method to not be requestable', function () {
+      this.model.removeActivePaymentMethod();
+
+      expect(this.model.setPaymentMethodRequestable).to.be.calledOnce;
+      expect(this.model.setPaymentMethodRequestable).to.be.calledWith({
+        isRequestable: false
+      });
+    });
+  });
+
   describe('getActivePaymentMethod', function () {
     it('returns _activePaymentMethod', function () {
       var model = new DropinModel(this.modelOptions);
@@ -435,6 +508,20 @@ describe('DropinModel', function () {
     });
   });
 
+  describe('cancelInitialization', function () {
+    it('emits cancelInitialization event wth the error', function (done) {
+      var dropinModel = new DropinModel(this.modelOptions);
+      var fakeError = {foo: 'boo'};
+
+      dropinModel.on('cancelInitialization', function (error) {
+        expect(error).to.deep.equal(fakeError);
+        done();
+      });
+
+      dropinModel.cancelInitialization(fakeError);
+    });
+  });
+
   describe('reportError', function () {
     it('emits an errorOccurred event with the error', function (done) {
       var dropinModel = new DropinModel(this.modelOptions);
@@ -503,7 +590,8 @@ describe('DropinModel', function () {
 
       expect(this.model._emit).to.be.calledOnce;
       expect(this.model._emit).to.be.calledWith('paymentMethodRequestable', {
-        type: 'card'
+        type: 'card',
+        paymentMethodIsSelected: false
       });
     });
 
@@ -574,7 +662,8 @@ describe('DropinModel', function () {
 
       expect(this.model._emit).to.be.calledOnce;
       expect(this.model._emit).to.be.calledWith('paymentMethodRequestable', {
-        type: 'ANOTHER_TYPE'
+        type: 'ANOTHER_TYPE',
+        paymentMethodIsSelected: false
       });
     });
 
@@ -586,6 +675,50 @@ describe('DropinModel', function () {
       });
 
       expect(this.model._paymentMethodRequestableType).to.not.exist;
+    });
+
+    it('includes the paymentMethodIsSelected as true if Drop-in displays a selected payment method', function () {
+      var selectedPaymentMethod = {foo: 'bar'};
+
+      this.model.setPaymentMethodRequestable({
+        isRequestable: true,
+        type: 'TYPE',
+        selectedPaymentMethod: selectedPaymentMethod
+      });
+
+      expect(this.model._emit).to.be.calledWith('paymentMethodRequestable', {
+        type: 'TYPE',
+        paymentMethodIsSelected: true
+      });
+    });
+
+    it('includes the paymentMethodIsSelected as false if no payment method is actively selected', function () {
+      this.model.setPaymentMethodRequestable({
+        isRequestable: true,
+        type: 'TYPE'
+      });
+
+      expect(this.model._emit).to.be.calledWith('paymentMethodRequestable', {
+        type: 'TYPE',
+        paymentMethodIsSelected: false
+      });
+    });
+  });
+
+  describe('selectPaymentOption', function () {
+    beforeEach(function () {
+      this.model = new DropinModel(this.modelOptions);
+
+      this.sandbox.stub(this.model, '_emit');
+    });
+
+    it('emits a paymentOptionSelected event with the id of the payment option that was selected', function () {
+      this.model.selectPaymentOption('card');
+
+      expect(this.model._emit).to.be.calledOnce;
+      expect(this.model._emit).to.be.calledWith('paymentOptionSelected', {
+        paymentOption: 'card'
+      });
     });
   });
 });

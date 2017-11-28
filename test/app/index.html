@@ -39,6 +39,11 @@
     display: none;
   }
 
+  #ready {
+    position: fixed;
+    left: -200%;
+  }
+
   input[type="submit"], button {
     font: inherit;
     padding: 0.5em 1em;
@@ -74,6 +79,7 @@
   <input id="pay-button" type="submit" value="Pay" disabled>
   <button id="create-button" disabled type="button">Create</button>
   <button id="teardown-button" type="button">Teardown</button>
+  <button class="hidden" id="clear-button" type="button">Clear Payment Method</button>
 </form>
 
 <div id="update-paypal-configuration" class="hidden">
@@ -88,6 +94,7 @@
 </div>
 
 <pre id="results"></pre>
+<div id="ready"></div>
 
 <footer>
   <p><a href="docs">View the Reference Documentation</a></p>
@@ -96,6 +103,11 @@
 <script src="assign-polyfill.js"></script>
 <script src="web/dropin/dev/js/dropin.js"></script>
 
+<script>
+  // IE9 doesn't have console defined unless the dev tools are open
+  window.console = window.console || {};
+  window.console.log = window.console.log || function () {};
+</script>
 <script>
   var defaultCreateObject = {
     // If you are copying this demo app for your integration,
@@ -120,6 +132,8 @@
   var payButton = document.querySelector('#pay-button');
   var createButton = document.querySelector('#create-button');
   var teardownButton = document.querySelector('#teardown-button');
+  var clearButton = document.querySelector('#clear-button');
+  var ready = document.querySelector('#ready');
 
   function getDropinConfig () {
     var query = window.location.search.substring(1);
@@ -170,30 +184,46 @@
 
     braintree.dropin.create(config, function (err, instance) {
       if (err) {
+        ready.textContent = 'error';
         error.textContent = err.message;
         throw err;
       }
 
       if (!config.disablePaymentMethodRequestableListeners) {
         if (instance.isPaymentMethodRequestable()) {
+          clearButton.className = '';
           payButton.removeAttribute('disabled');
         }
 
         instance.on('paymentMethodRequestable', function (event) {
+          if (event.paymentMethodIsSelected) {
+            clearButton.className = '';
+          }
           payButton.removeAttribute('disabled');
+          console.log('paymentMethodRequestable', event);
         });
 
         instance.on('noPaymentMethodRequestable', function (event) {
+          clearButton.className = 'hidden';
           payButton.setAttribute('disabled', true);
+          console.log('noPaymentMethodRequestable');
         });
       } else {
         payButton.removeAttribute('disabled');
+      }
+
+      if (!config.disablePaymentOptionSelectedListener) {
+        instance.on('paymentOptionSelected', function (event) {
+          console.log('paymentOptionSelected', event.paymentOption);
+        });
       }
 
       teardownButton.removeAttribute('disabled');
       createButton.setAttribute('disabled', true);
 
       dropinInstance = instance;
+
+      ready.textContent = 'ready';
     });
   }
 
@@ -220,16 +250,24 @@
 
     dropinInstance.requestPaymentMethod(function (err, payload) {
       if (err) {
+        clearButton.className = 'hidden';
         error.textContent = err.message;
         results.textContent = '';
       } else {
+        clearButton.className = '';
         results.textContent = JSON.stringify(payload, null, 2);
         error.textContent = '';
       }
     });
   }, false);
 
+  clearButton.addEventListener('click', function () {
+    dropinInstance.clearSelectedPaymentMethod();
+    clearButton.className = 'hidden';
+  });
+
   teardownButton.addEventListener('click', function () {
+    clearButton.className = 'hidden';
     teardownButton.setAttribute('disabled', true);
     dropinInstance.teardown(function (err) {
       if (err) {

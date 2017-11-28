@@ -206,6 +206,7 @@ $loader-scale-duration: 300ms;
 }
 
 .braintree-loaded .braintree-upper-container {
+  min-height: inherit;
   min-height: auto;
 
   &:before {
@@ -256,6 +257,10 @@ $loader-scale-duration: 300ms;
     background: #EAEAEA;
     cursor: not-allowed;
 
+    &:hover .braintree-option__label {
+      font-weight: normal;
+    }
+
     .braintree-option__label {
       color: #787878;
     }
@@ -263,6 +268,10 @@ $loader-scale-duration: 300ms;
     .braintree-option__disabled-message {
       float: right;
       font-size: 14px;
+
+      span {
+        border-bottom: 1px solid $border-color;
+      }
     }
   }
 
@@ -288,6 +297,52 @@ $loader-scale-duration: 300ms;
     margin-left: 20px;
     width: 100%;
   }
+}
+
+/* =========================================================================
+   Apple Pay buttons
+   ========================================================================= */
+@supports (-webkit-appearance: -apple-pay-button) {
+    .apple-pay-button {
+        display: inline-block;
+        -webkit-appearance: -apple-pay-button;
+    }
+    .apple-pay-button-black {
+        -apple-pay-button-style: black;
+    }
+    .apple-pay-button-white {
+        -apple-pay-button-style: white;
+    }
+    .apple-pay-button-white-outline {
+        -apple-pay-button-style: white-outline;
+    }
+}
+@supports not (-webkit-appearance: -apple-pay-button) {
+    .apple-pay-button {
+        display: inline-block;
+        background-size: 100% 60%;
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        border-radius: 5px;
+        padding: 0px;
+        box-sizing: border-box;
+        min-width: 200px;
+        min-height: 32px;
+        max-height: 64px;
+    }
+    .apple-pay-button-black {
+        background-image: -webkit-named-image(apple-pay-logo-white);
+        background-color: black;
+    }
+    .apple-pay-button-white {
+        background-image: -webkit-named-image(apple-pay-logo-black);
+        background-color: white;
+    }
+    .apple-pay-button-white-with-line {
+        background-image: -webkit-named-image(apple-pay-logo-black);
+        background-color: white;
+        border: .5px solid black;
+    }
 }
 
 /* =========================================================================
@@ -442,6 +497,14 @@ $loader-scale-duration: 300ms;
       display: inline-block !important;
     }
   }
+
+  .braintree-sheet__button--apple-pay {
+    margin: 0 auto;
+
+    iframe {
+      display: inline-block !important;
+    }
+  }
 }
 
 .braintree-form__field-group--has-error {
@@ -500,6 +563,12 @@ $loader-scale-duration: 300ms;
     .braintree-form__field {
       position: relative;
 
+      label {
+        cursor: text;
+        display: block;
+        margin: 0;
+      }
+
       .braintree-form__icon-container {
         margin-top: -14px;
         position: absolute;
@@ -519,6 +588,24 @@ $loader-scale-duration: 300ms;
 
         &.braintree-form__field--valid {
           border-color: $black-40;
+        }
+
+        input {
+          border:none;
+          background-image:none;
+          background-color:transparent;
+          -webkit-box-shadow: none;
+          -moz-box-shadow: none;
+          box-shadow: none;
+          width: 100%;
+          height: 100%;
+          font-size: 16px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+          color: rgb(0, 0, 0);
+
+          &:focus {
+            outline: none;
+          }
         }
       }
     }
@@ -636,7 +723,7 @@ $loader-scale-duration: 300ms;
     fill: $background-color;
     height: 41px;
     margin-right: 7px;
-    padding: 7px 10px 10px;
+    padding: 10px;
     transform: scale(0);
     transition: transform 300ms $curve-easeOutBack;
     width: 41px;
@@ -742,7 +829,8 @@ $loader-scale-duration: 300ms;
 .braintree-show-methods .braintree-methods,
 .braintree-show-options .braintree-options,
 .braintree-show-paypal .braintree-paypal,
-.braintree-show-paypalCredit .braintree-paypalCredit {
+.braintree-show-paypalCredit .braintree-paypalCredit,
+.braintree-show-applePay .braintree-applePay {
   display: block;
   height: auto;
   overflow: visible;
@@ -762,6 +850,10 @@ $loader-scale-duration: 300ms;
 .braintree-show-options [data-braintree-id='choose-a-way-to-pay'] {
   transform: none;
   visibility: visible;
+}
+
+.braintree-show-methods [data-braintree-id='methods-label'].braintree-no-payment-method-selected {
+  transform: translateY(30px);
 }
 
 .braintree-show-methods.braintree-show-options [data-braintree-id='choose-a-way-to-pay'] {
@@ -794,7 +886,8 @@ $loader-scale-duration: 300ms;
 
 .braintree-show-card [data-braintree-id='other-ways-to-pay'],
 .braintree-show-methods [data-braintree-id='other-ways-to-pay'],
-.braintree-show-paypal [data-braintree-id='other-ways-to-pay'] {
+.braintree-show-paypal [data-braintree-id='other-ways-to-pay'],
+.braintree-show-applePay [data-braintree-id='other-ways-to-pay'] {
   display: block;
 }
 
@@ -891,3 +984,5 @@ $loader-scale-duration: 300ms;
     position: absolute;
   }
 }
+
+@import 'three-d-secure';

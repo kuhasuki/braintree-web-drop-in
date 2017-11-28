@@ -6,6 +6,7 @@ var constants = require('./constants');
 var paymentMethodTypes = constants.paymentMethodTypes;
 var paymentOptionIDs = constants.paymentOptionIDs;
 var isGuestCheckout = require('./lib/is-guest-checkout');
+var isHTTPS = require('./lib/is-https');
 
 function DropinModel(options) {
   this.componentID = options.componentID;
@@ -59,6 +60,20 @@ DropinModel.prototype.changeActivePaymentView = function (paymentViewID) {
   this._emit('changeActivePaymentView', paymentViewID);
 };
 
+DropinModel.prototype.removeActivePaymentMethod = function () {
+  this._activePaymentMethod = null;
+  this._emit('removeActivePaymentMethod');
+  this.setPaymentMethodRequestable({
+    isRequestable: false
+  });
+};
+
+DropinModel.prototype.selectPaymentOption = function (paymentViewID) {
+  this._emit('paymentOptionSelected', {
+    paymentOption: paymentViewID
+  });
+};
+
 DropinModel.prototype._shouldEmitRequestableEvent = function (options) {
   var requestableStateHasNotChanged = this.isPaymentMethodRequestable() === options.isRequestable;
   var typeHasNotChanged = options.type === this._paymentMethodRequestableType;
@@ -72,6 +87,10 @@ DropinModel.prototype._shouldEmitRequestableEvent = function (options) {
 
 DropinModel.prototype.setPaymentMethodRequestable = function (options) {
   var shouldEmitEvent = this._shouldEmitRequestableEvent(options);
+  var paymentMethodRequestableResponse = {
+    paymentMethodIsSelected: Boolean(options.selectedPaymentMethod),
+    type: options.type
+  };
 
   this._paymentMethodIsRequestable = options.isRequestable;
 
@@ -86,7 +105,7 @@ DropinModel.prototype.setPaymentMethodRequestable = function (options) {
   }
 
   if (options.isRequestable) {
-    this._emit('paymentMethodRequestable', {type: options.type});
+    this._emit('paymentMethodRequestable', paymentMethodRequestableResponse);
   } else {
     this._emit('noPaymentMethodRequestable');
   }
@@ -133,6 +152,10 @@ DropinModel.prototype._checkAsyncDependencyFinished = function () {
   }
 };
 
+DropinModel.prototype.cancelInitialization = function (error) {
+  this._emit('cancelInitialization', error);
+};
+
 DropinModel.prototype.reportError = function (error) {
   this._emit('errorOccurred', error);
 };
@@ -159,7 +182,7 @@ DropinModel.prototype._getSupportedPaymentMethods = function (paymentMethods) {
 
 function getSupportedPaymentOptions(options) {
   var result = [];
-  var paymentOptionPriority = options.merchantConfiguration.paymentOptionPriority || ['card', 'paypal', 'paypalCredit'];
+  var paymentOptionPriority = options.merchantConfiguration.paymentOptionPriority || ['card', 'paypal', 'paypalCredit', 'applePay'];
 
   if (!(paymentOptionPriority instanceof Array)) {
     throw new DropinError('paymentOptionPriority must be an array.');
@@ -183,6 +206,7 @@ function getSupportedPaymentOptions(options) {
 
 function isPaymentOptionEnabled(paymentOption, options) {
   var gatewayConfiguration = options.client.getConfiguration().gatewayConfiguration;
+  var applePayEnabled, applePayBrowserSupported;
 
   if (paymentOption === 'card') {
     return gatewayConfiguration.creditCards.supportedCardTypes.length > 0;
@@ -190,6 +214,11 @@ function isPaymentOptionEnabled(paymentOption, options) {
     return gatewayConfiguration.paypalEnabled && Boolean(options.merchantConfiguration.paypal);
   } else if (paymentOption === 'paypalCredit') {
     return gatewayConfiguration.paypalEnabled && Boolean(options.merchantConfiguration.paypalCredit);
+  } else if (paymentOption === 'applePay') {
+    applePayEnabled = gatewayConfiguration.applePayWeb && Boolean(options.merchantConfiguration.applePay);
+    applePayBrowserSupported = global.ApplePaySession && isHTTPS.isHTTPS() && global.ApplePaySession.canMakePayments();
+
+    return applePayEnabled && applePayBrowserSupported;
   }
   throw new DropinError('paymentOptionPriority: Invalid payment option specified.');
 }

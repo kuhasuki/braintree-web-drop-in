@@ -1,7 +1,7 @@
 'use strict';
 
-var browserDetection = require('../../../../src/lib/browser-detection');
-var onTransitionEnd = require('../../../../src/lib/transition-helper').onTransitionEnd;
+var browserDetection = require('../../../src/lib/browser-detection');
+var onTransitionEnd = require('../../../src/lib/transition-helper').onTransitionEnd;
 
 describe('onTransitionEnd', function () {
   beforeEach(function () {
@@ -13,6 +13,26 @@ describe('onTransitionEnd', function () {
     var element = document.createElement('div');
 
     this.sandbox.stub(browserDetection, 'isIe9').returns(true);
+
+    onTransitionEnd(element, this.fakePropertyName, done);
+  });
+
+  it('immediately calls callback when element has display: none', function (done) {
+    var element = document.createElement('div');
+
+    element.style.display = 'none';
+
+    onTransitionEnd(element, this.fakePropertyName, done);
+  });
+
+  it('immediately calls callback when a parent element has display: none', function (done) {
+    var topLevelElement = document.createElement('div');
+    var middleElement = document.createElement('div');
+    var element = document.createElement('div');
+
+    topLevelElement.style.display = 'none';
+    middleElement.appendChild(element);
+    topLevelElement.appendChild(middleElement);
 
     onTransitionEnd(element, this.fakePropertyName, done);
   });
