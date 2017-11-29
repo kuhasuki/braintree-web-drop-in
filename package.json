@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/braintree/braintree-web-dropin.git"
+    "url": "git+https://github.com/twitchalerts/braintree-web-dropin.git"
   },
   "license": "MIT",
   "devDependencies": {
